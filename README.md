@@ -22,7 +22,7 @@ Hecho en HTML, CSS y JavaScript. Las tipografías de Google Fonts tienen alterna
 
 ## Reclamo de premios y aviso por correo
 
-Al superar los tres niveles aparece el botón de reclamo. Se escapa cinco veces, luego una ola de flores llena la pantalla y el visitante puede escribir su nombre para reclamar los tres premios simbólicos.
+Al superar los tres niveles aparece el botón de reclamo. Se escapa cinco veces, luego una ola de flores llena la pantalla y ella puede reclamar los tres premios simbólicos sin completar ningún dato. El aviso identifica el reclamo como «Amor».
 
 La web pública **no guarda credenciales**. El archivo `apps-script.gs` es la función de Google Apps Script que envía el aviso al Gmail del dueño mediante `MailApp` (permiso de envío). Tiene destinatario fijo, un envío por minuto y un máximo de 30 por día. Antes de activar el correo:
 

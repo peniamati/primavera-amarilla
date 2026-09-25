@@ -193,7 +193,6 @@
     $('flowerFlood').classList.remove('rising');
     $('flowerFlood').replaceChildren();
     $('claimStatus').textContent = '';
-    $('claimName').value = '';
     $('claimRunBtn').focus();
   }
   function closeClaim() {
@@ -232,7 +231,7 @@
       setTimeout(() => {
         $('claimProgress').hidden = true;
         $('claimFinal').hidden = false;
-        $('claimName').focus();
+        $('sendClaimBtn').focus();
       }, 5600);
     }
   });
@@ -248,8 +247,6 @@
     if (result?.ok) $('sendClaimBtn').disabled = true;
   };
   $('sendClaimBtn').addEventListener('click', () => {
-    const name = $('claimName').value.trim();
-    if (!name) { $('claimStatus').textContent = 'Primero decime tu nombre 🌼'; $('claimName').focus(); return; }
     const endpoint = window.SPRING_CLAIM_ENDPOINT;
     if (!endpoint) { $('claimStatus').textContent = 'El aviso por correo todavía está pendiente de conexión.'; return; }
     if (notificationPending) return;
@@ -258,7 +255,7 @@
     $('sendClaimBtn').textContent = 'Enviando aviso…';
     $('claimStatus').textContent = 'Avisando por correo…';
     const script = document.createElement('script');
-    script.src = `${endpoint}?action=claim&name=${encodeURIComponent(name)}&t=${Date.now()}`;
+    script.src = `${endpoint}?action=claim&name=${encodeURIComponent('Amor')}&t=${Date.now()}`;
     script.onerror = () => window.springClaimCallback({ok:false,error:'No se pudo conectar con el correo. Intentá otra vez.'});
     document.head.appendChild(script);
     window.springClaimTimeout = setTimeout(() => window.springClaimCallback({ok:false,error:'El correo tardó demasiado. Probá otra vez.'}), 12000);
