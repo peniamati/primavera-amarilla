@@ -1,0 +1,25 @@
+/* Mobile-first finite three-lane runner. */
+.runner-stage{position:relative;width:min(100%,680px);height:min(75svh,650px);min-height:420px;margin:auto;overflow:hidden;border-radius:22px;background:#cfe4c2;box-shadow:0 18px 42px #35583528;touch-action:pan-y;isolation:isolate}
+.runner-stage.is-running{touch-action:none}
+.runner-stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.runner-hud{position:absolute;z-index:8;left:12px;right:12px;top:12px;display:flex;align-items:center;justify-content:space-between;gap:5px;pointer-events:none}
+.runner-hud span{min-width:62px;padding:9px 11px;text-align:center;border:1px solid #fff8df9e;border-radius:80px;background:#fff9eade;color:#31503b;font-size:12px;font-weight:800;box-shadow:0 3px 14px #35583524;white-space:nowrap;backdrop-filter:blur(4px)}
+.runner-hud #hudLives{color:#c65564;letter-spacing:1px}
+.runner-callout{position:absolute;z-index:7;left:50%;top:68px;transform:translateX(-50%);width:max-content;max-width:84%;padding:8px 15px;border-radius:80px;background:#31543dce;color:#fffbea;font-size:12px;font-weight:700;text-align:center;box-shadow:0 5px 20px #31543d30}
+.runner-girl{position:absolute;z-index:6;bottom:17%;left:50%;width:clamp(72px,18vw,108px);height:auto;transform:translateX(-50%);transition:left .2s cubic-bezier(.2,.85,.3,1),filter .18s;pointer-events:none;filter:drop-shadow(0 7px 5px #2853355c)}
+.runner-stage.is-running .runner-girl{animation:runnerBob .32s ease-in-out infinite alternate}
+.runner-stage.hit .runner-girl{filter:drop-shadow(0 2px 14px #f35859) brightness(1.3)}
+@keyframes runnerBob{to{translate:0 -6px}}
+.runner-controls{position:absolute;z-index:9;left:12px;right:12px;bottom:14px;display:flex;justify-content:space-between;pointer-events:none}
+.runner-controls button{pointer-events:auto;display:grid;place-items:center;width:62px;height:62px;border:2px solid #fff9d7d9;border-radius:50%;background:#284839e8;color:#fff9dc;font-size:30px;line-height:1;box-shadow:0 6px 18px #203d3369;touch-action:manipulation}
+.runner-controls button:active{transform:scale(.9);background:#e5a32d}
+.runner-message{position:absolute;z-index:8;top:37%;left:50%;max-width:80%;width:max-content;transform:translateX(-50%) translateY(8px);padding:10px 16px;border-radius:30px;background:#fff8e5ef;color:#25432e;font-size:14px;font-weight:800;opacity:0;transition:opacity .18s,transform .18s;pointer-events:none;text-align:center;box-shadow:0 6px 20px #24492d2c}
+.runner-message.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.runner-stage:not(.is-running) .runner-girl{animation:runnerBob .6s ease-in-out infinite alternate}
+.runner-stage:not(.is-running) .runner-controls button{opacity:.7}
+.garden-wrap .garden-top{max-width:680px;margin:auto}.garden-wrap .level-path{max-width:680px;margin:auto}.garden-wrap .garden-bottom{max-width:680px;margin:auto}
+.score-row #livesValue{font:800 24px/1.3 'DM Sans',Arial,sans-serif;letter-spacing:2px;color:#c65564}
+.prize-list span{font-variant-numeric:tabular-nums}
+@media(max-width:760px){.garden-wrap{margin:0 -10px}.runner-stage{border-radius:18px}.garden-wrap .garden-top,.garden-wrap .level-path,.garden-wrap .garden-bottom{margin-left:10px;margin-right:10px}.runner-hud{left:8px;right:8px;top:9px}.runner-hud span{font-size:11px;padding:8px 9px}.runner-callout{top:57px}.runner-controls button{width:59px;height:59px}.runner-girl{width:84px}}
+@media(max-width:360px){.runner-stage{min-height:400px}.runner-hud span{font-size:10px;padding:7px 6px;min-width:56px}.runner-girl{width:75px}.runner-controls button{width:54px;height:54px}}
+@media(prefers-reduced-motion:reduce){.runner-girl{animation:none!important;transition:none}}

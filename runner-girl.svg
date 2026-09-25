@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 174" role="img" aria-label="Chica rubia corriendo">
+<style>
+.leg-a{transform-origin:55px 107px;animation:runA .45s ease-in-out infinite alternate}.leg-b{transform-origin:73px 107px;animation:runB .45s ease-in-out infinite alternate}
+.arm-a{transform-origin:44px 66px;animation:runB .45s ease-in-out infinite alternate}.arm-b{transform-origin:84px 66px;animation:runA .45s ease-in-out infinite alternate}
+.ponytail{transform-origin:84px 35px;animation:tail .45s ease-in-out infinite alternate}
+@keyframes runA{to{transform:rotate(17deg)}}@keyframes runB{to{transform:rotate(-19deg)}}@keyframes tail{to{transform:rotate(-17deg)}}
+</style>
+<ellipse cx="64" cy="165" rx="33" ry="5" fill="#29472b" opacity=".2"/>
+<g class="leg-a"><path d="M51 104l-6 34 6 20 13-2 1-18 5-30" fill="#315d60" stroke="#264348" stroke-width="3" stroke-linejoin="round"/><path d="M48 151q-7 3-8 10 2 6 17 6l10-5-3-8z" fill="#f9f5e9" stroke="#294248" stroke-width="3"/></g>
+<g class="leg-b"><path d="M72 104l11 35-4 19-14-2-3-19-2-29" fill="#40777b" stroke="#264348" stroke-width="3" stroke-linejoin="round"/><path d="M65 153l16-1q9 5 8 11-5 6-18 3l-9-5z" fill="#fffaf0" stroke="#294248" stroke-width="3"/></g>
+<g class="arm-a"><path d="M46 66q-13 2-17 18l-7 17q1 9 8 9 6-1 7-8l8-16 10-10" fill="#f3bd92" stroke="#985a47" stroke-width="3" stroke-linecap="round"/><ellipse cx="27" cy="106" rx="7" ry="9" fill="#f3bd92" stroke="#985a47" stroke-width="2"/></g>
+<g class="arm-b"><path d="M82 66q15 3 17 18l7 17q0 9-8 9-6-1-7-9l-8-16-11-10" fill="#f3bd92" stroke="#985a47" stroke-width="3" stroke-linecap="round"/><ellipse cx="102" cy="105" rx="7" ry="9" fill="#f3bd92" stroke="#985a47" stroke-width="2"/></g>
+<path d="M48 62q16-8 33 0l11 47q-25 17-57 0z" fill="#e77e88" stroke="#8f4958" stroke-width="3" stroke-linejoin="round"/>
+<path d="M41 96q23 12 47 0l5 17q-29 11-58 0z" fill="#f0a4a3" stroke="#8f4958" stroke-width="2"/>
+<path d="M46 65q17 11 36 0" fill="none" stroke="#ffd6a5" stroke-width="5" stroke-linecap="round"/>
+<path d="M55 60v-11h18v11" fill="#f2bb93" stroke="#985a47" stroke-width="2"/>
+<path d="M41 36q-1-27 23-30 29 0 29 29l-4 26q-12 13-45-1z" fill="#e7a835" stroke="#9e6824" stroke-width="3"/>
+<path d="M48 27q9-15 27-11 12 5 10 22l-5 20q-17 10-32-1l-5-17z" fill="#f5c49a" stroke="#985a47" stroke-width="2"/>
+<path d="M41 37q-3-30 20-31 24-2 31 23l-7 9q-4-17-17-19-11 19-29 19z" fill="#f7c449" stroke="#b67d2b" stroke-width="3"/>
+<path d="M45 36q-1 17 3 26 10 11 18 12-18 3-28-15l-4-23z" fill="#e5a932" stroke="#b67d2b" stroke-width="2"/>
+<g class="ponytail"><path d="M85 25q20 0 19 17l-5 24q12 14-1 26-9 4-15-4 8-10 4-24-4-13-1-26z" fill="#efb23f" stroke="#a46d26" stroke-width="3"/><path d="M88 38q9-1 12 4" fill="none" stroke="#ffdb76" stroke-width="4" stroke-linecap="round"/><path d="M87 28q7-7 13 1" fill="none" stroke="#df6673" stroke-width="5" stroke-linecap="round"/></g>
+<path d="M47 22q12-17 30-7" fill="none" stroke="#ffe384" stroke-width="4" stroke-linecap="round" opacity=".8"/>
+<path d="M47 73l-2 25" fill="none" stroke="#ffd0bd" stroke-width="3" stroke-linecap="round"/>
+<circle cx="65" cy="86" r="6" fill="#fce2b0" stroke="#b97854" stroke-width="2"/><path d="M62 86h6m-3-3v6" stroke="#c47f34" stroke-width="1.3"/>
+</svg>

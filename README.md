@@ -1,14 +1,14 @@
 # Primavera amarilla 🌼
 
-Web móvil interactiva de primavera, sin instalación ni compilación. Una puerta de entrada abre un jardín en el que brotan flores sin fin. El juego tiene tres niveles consecutivos:
+Web móvil interactiva de primavera, sin instalación ni compilación. Una puerta de entrada abre una carrera de tres carriles con una chica rubia. Deslizá a izquierda o derecha (también hay botones y teclado) para juntar flores amarillas de 10 en 10 y esquivar macetas. La carrera tiene tres tramos con vales acumulativos:
 
-| Nivel | Objetivo | Tiempo | Premio simbólico |
+| Tramo | Objetivo acumulado | Tiempo máximo | Vale simbólico |
 | --- | ---: | ---: | --- |
-| 1 | 8 flores | 25 s | Un abrazo |
-| 2 | 12 flores | 28 s | Un beso |
-| 3 | 16 flores | 32 s | Una salida a comer |
+| 1 | 100 flores | 35 s | Un abrazo |
+| 2 | 200 flores | 35 s | Un beso |
+| 3 | 300 flores | 35 s | Una salida a comer |
 
-Las flores y objetos intrusos caen del cielo. Tocá las flores amarillas para armar el ramo; tocar un objeto intruso quita una de las tres vidas. Las flores que se escapan no quitan vidas. El juego se puede reintentar tantas veces como se quiera. Los premios son mensajes divertidos para compartir, no cupones comerciales.
+Cada tramo comienza con tres vidas; chocar con una maceta quita una. Al alcanzar el objetivo aparece el vale en el camino. Si falla, reintenta ese tramo desde el último vale. Los premios son mensajes divertidos para compartir, no cupones comerciales.
 
 ## Música
 
