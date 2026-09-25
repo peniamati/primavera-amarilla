@@ -1,4 +1,9 @@
 /* Mobile catching game: falling targets and a bouquet that grows flower by flower. */
+.ambient-flower{position:absolute;bottom:var(--bottom);font-size:37px;line-height:1;transform:translateX(-50%);transform-origin:bottom center;animation:ambientGrow .65s ease-out both,ambientSway var(--sway) ease-in-out .7s infinite alternate;filter:drop-shadow(0 3px 2px #536d3c44)}
+.ambient-flower::before{content:"";position:absolute;z-index:-1;width:4px;height:var(--stem-height);background:#547b45;border-radius:6px;left:50%;top:28px;transform:rotate(7deg);transform-origin:top}
+.garden.playing .flower-field{opacity:0;transition:opacity .4s}
+@keyframes ambientGrow{from{opacity:0;scale:.2}to{opacity:1;scale:1}}
+@keyframes ambientSway{from{rotate:-4deg}to{rotate:5deg}}
 .fall-field{position:absolute;inset:0;z-index:8;pointer-events:none;overflow:hidden}
 .fall-item{position:absolute;top:-80px;width:66px;height:66px;margin-left:-33px;display:grid;place-items:center;border:0;border-radius:50%;background:#fff8dbd9;box-shadow:0 8px 20px #233c2b30;font-size:42px;line-height:1;touch-action:manipulation;pointer-events:auto;user-select:none;animation:flowerFall var(--fall-duration) linear forwards;will-change:transform}
 .fall-item.yellow-bloom{background:#fff9dce8;box-shadow:0 0 0 4px #fff8c95c,0 8px 21px #785e2329}

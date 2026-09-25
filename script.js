@@ -2,6 +2,7 @@
   'use strict';
   const $ = (id) => document.getElementById(id);
   const fallField = $('fallField');
+  const field = $('flowerField');
   const modal = $('gameModal');
   const levels = [
     { name: 'EL ABRAZO', prize: 'Un abrazo', emoji: '🫂', goal: 8, seconds: 25, weeds: .09, detail: 'Vale por un abrazo de esos que hacen bien.' },
@@ -49,6 +50,19 @@
     clearTimeout(messageTimeout);
     messageTimeout = setTimeout(() => el.classList.remove('show'), 1350);
   }
+  function growAmbientFlower() {
+    const flower = document.createElement('span');
+    flower.className = 'ambient-flower';
+    flower.textContent = '🌼';
+    flower.style.left = `${5 + Math.random() * 90}%`;
+    flower.style.bottom = `${12 + Math.random() * 18}%`;
+    flower.style.setProperty('--sway', `${2 + Math.random() * 2}s`);
+    flower.style.setProperty('--stem-height', `${52 + Math.random() * 65}px`);
+    field.appendChild(flower);
+    while (field.childElementCount > 18) field.firstElementChild.remove();
+  }
+  for (let i = 0; i < 10; i++) growAmbientFlower();
+  setInterval(growAmbientFlower, 800);
   function updateLevel() {
     const current = levels[level];
     $('levelTitle').textContent = `NIVEL ${level + 1} · ${current.name} ${current.emoji}`;
