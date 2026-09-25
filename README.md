@@ -24,11 +24,11 @@ Hecho en HTML, CSS y JavaScript. Las tipografías de Google Fonts tienen alterna
 
 Al superar los tres niveles aparece el botón de reclamo. Se escapa cinco veces, luego caen flores amarillas como confeti y se acumulan desde abajo hasta llenar la pantalla. Ella puede reclamar los tres premios simbólicos sin completar ningún dato. El aviso identifica el reclamo como «Amor».
 
-La web pública **no guarda credenciales**. El archivo `apps-script.gs` es la función de Google Apps Script que envía el aviso al Gmail del dueño mediante `MailApp` (permiso de envío). Tiene destinatario fijo, un envío por minuto y un máximo de 30 por día. Antes de activar el correo:
+La web pública **no guarda credenciales**. El archivo `apps-script.gs` es la función de Google Apps Script que envía el aviso al Gmail del dueño mediante `MailApp` (permiso de envío). Tiene destinatario fijo, un envío por minuto y un máximo de 30 por día. El proyecto publicado ya tiene la URL de implementación en `config.js`. Para instalar otra instancia:
 
 1. Crear un proyecto de Apps Script con `apps-script.gs`.
 2. En **Configuración del proyecto → Propiedades de script**, guardar `CLAIM_RECIPIENT` con el correo destinatario.
 3. Implementar como **Aplicación web**, ejecutar como propietario y permitir acceso **Cualquier persona**. Autorizar el permiso de envío de correo en Google.
 4. Pegar la URL pública `/exec` devuelta por Google en `config.js` como `SPRING_CLAIM_ENDPOINT` y publicar de nuevo.
 
-Hasta completar esa configuración, el botón final explica que el correo sigue pendiente de conexión; nunca finge haber enviado el aviso. La función pública puede recibir solicitudes de cualquier visitante, por eso fija el destinatario y limita los envíos. No uses contraseñas, claves ni tokens en `config.js`.
+Si falta esa configuración, el botón final explica que el correo sigue pendiente de conexión; nunca finge haber enviado el aviso. La función pública puede recibir solicitudes de cualquier visitante, por eso fija el destinatario y limita los envíos. No uses contraseñas, claves ni tokens en `config.js`.
