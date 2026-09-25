@@ -190,7 +190,7 @@
       if(level<2){level++;$('startBtn').onclick=startGame;}
       else $('startBtn').onclick=openClaim;
     }else{
-      $('modalTitle').textContent=lives?'¡Casi llegás al vale! 🌼':'¡Uy, una maceta! 🌼';
+      $('modalTitle').textContent=lives?'¡Casi llegás al vale! 🌼':(mode==='runner'?'¡Uy, un obstáculo! 🌼':'¡Uy, una maceta! 🌼');
       $('modalText').textContent=(lives?'Se terminó este tramo.':'Se terminaron las tres vidas.')+' Juntaste '+score+' de '+current.target+' flores.';
       $('gameState').textContent='Reintentás este tramo desde '+(mode==='runner'?level*100:0)+' flores; los vales anteriores ya son tuyos.';
       $('startBtn').textContent='Reintentar tramo '+(level+1)+' ↗';
