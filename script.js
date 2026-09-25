@@ -11,6 +11,7 @@
   let level = 0, score = 0, remaining = levels[0].seconds;
   let playing = false, entered = false, musicOn = true;
   let timer, spawnTimer, messageTimeout, lastFocus, flowerId = 0;
+  let claimStage = 0, notificationPending = false;
 
   function setMusicState(on) {
     musicOn = on;
@@ -144,9 +145,9 @@
       $('modalTitle').textContent = `¡Ganaste ${current.prize.toLowerCase()}! ${current.emoji}`;
       $('modalText').textContent = current.detail;
       $('gameState').textContent = level < levels.length-1 ? 'Un premio más te espera en el próximo nivel.' : '¡Completaste los tres niveles! Compartí esta página 💛';
-      $('startBtn').textContent = level < levels.length-1 ? 'Ir al siguiente nivel ↗' : 'Volver a jugar desde el 1 ↗';
-      level = (level + 1) % levels.length;
-      $('startBtn').onclick = startGame;
+      $('startBtn').textContent = level < levels.length-1 ? 'Ir al siguiente nivel ↗' : 'Reclamar premios ↗';
+      if (level < levels.length-1) { level++; $('startBtn').onclick = startGame; }
+      else $('startBtn').onclick = openClaim;
     } else {
       $('modalTitle').textContent = '¡Casi, casi! 🌼';
       $('modalText').textContent = `Juntaste ${score} de ${current.goal} flores. Los premios no se escapan: probá de nuevo.`;
@@ -171,5 +172,96 @@
   $('closeBtn').addEventListener('click', closeModal);
   document.querySelector('.modal-backdrop').addEventListener('click', closeModal);
   document.addEventListener('keydown', event => { if (event.key === 'Escape' && !modal.hidden) closeModal(); });
+  const taunts = [
+    { text: '¿Estás segura?', x: 65, y: 29 },
+    { text: 'Mirá que no se puede deshacer', x: 35, y: 69 },
+    { text: 'En serio, no te conviene apretarlo', x: 65, y: 74 },
+    { text: '¿No entendés que no tenés que apretar?', x: 35, y: 31 },
+    { text: 'Última oportunidad…', x: 50, y: 54 }
+  ];
+  function openClaim() {
+    closeModal();
+    claimStage = 0;
+    $('claimOverlay').hidden = false;
+    document.body.style.overflow = 'hidden';
+    $('claimRunBtn').hidden = false;
+    $('claimRunBtn').textContent = 'Reclamar premios ↗';
+    $('claimRunBtn').style.left = '50%';
+    $('claimRunBtn').style.top = '54%';
+    $('claimProgress').hidden = true;
+    $('claimFinal').hidden = true;
+    $('flowerFlood').classList.remove('rising');
+    $('flowerFlood').replaceChildren();
+    $('claimStatus').textContent = '';
+    $('claimName').value = '';
+    $('claimRunBtn').focus();
+  }
+  function closeClaim() {
+    $('claimOverlay').hidden = true;
+    document.body.style.overflow = '';
+    $('playBtn').textContent = 'Jugar otra vez ↗';
+    level = 0;
+    score = 0;
+    remaining = levels[0].seconds;
+    updateLevel();
+    $('playBtn').focus();
+  }
+  $('claimClose').addEventListener('click', closeClaim);
+  $('claimRunBtn').addEventListener('click', () => {
+    if (claimStage < taunts.length) {
+      const next = taunts[claimStage++];
+      $('claimRunBtn').textContent = next.text;
+      $('claimRunBtn').style.left = `${next.x}%`;
+      $('claimRunBtn').style.top = `${next.y}%`;
+      $('liveStatus').textContent = next.text;
+    } else {
+      $('claimRunBtn').hidden = true;
+      $('claimProgress').hidden = false;
+      const flood = $('flowerFlood');
+      for (let i = 0; i < 170; i++) {
+        const flower = document.createElement('span');
+        flower.className = 'flood-flower';
+        flower.textContent = ['✿','✽','✾','🌼'][i % 4];
+        flower.style.left = `${(i * 61.8) % 100}%`;
+        flower.style.top = `${(i * 37.3) % 100}%`;
+        flower.style.fontSize = `${22 + (i * 13) % 34}px`;
+        flower.style.rotate = `${(i * 31) % 40 - 20}deg`;
+        flood.appendChild(flower);
+      }
+      requestAnimationFrame(() => flood.classList.add('rising'));
+      setTimeout(() => {
+        $('claimProgress').hidden = true;
+        $('claimFinal').hidden = false;
+        $('claimName').focus();
+      }, 5600);
+    }
+  });
+  window.springClaimCallback = (result) => {
+    if (!notificationPending) return;
+    notificationPending = false;
+    clearTimeout(window.springClaimTimeout);
+    $('sendClaimBtn').disabled = false;
+    $('sendClaimBtn').textContent = 'Ahora sí, reclamar ↗';
+    $('claimStatus').textContent = result?.ok
+      ? '¡Listo! El aviso por correo fue enviado 🌼'
+      : (result?.error || 'No se pudo enviar el correo. Intentá otra vez.');
+    if (result?.ok) $('sendClaimBtn').disabled = true;
+  };
+  $('sendClaimBtn').addEventListener('click', () => {
+    const name = $('claimName').value.trim();
+    if (!name) { $('claimStatus').textContent = 'Primero decime tu nombre 🌼'; $('claimName').focus(); return; }
+    const endpoint = window.SPRING_CLAIM_ENDPOINT;
+    if (!endpoint) { $('claimStatus').textContent = 'El aviso por correo todavía está pendiente de conexión.'; return; }
+    if (notificationPending) return;
+    notificationPending = true;
+    $('sendClaimBtn').disabled = true;
+    $('sendClaimBtn').textContent = 'Enviando aviso…';
+    $('claimStatus').textContent = 'Avisando por correo…';
+    const script = document.createElement('script');
+    script.src = `${endpoint}?action=claim&name=${encodeURIComponent(name)}&t=${Date.now()}`;
+    script.onerror = () => window.springClaimCallback({ok:false,error:'No se pudo conectar con el correo. Intentá otra vez.'});
+    document.head.appendChild(script);
+    window.springClaimTimeout = setTimeout(() => window.springClaimCallback({ok:false,error:'El correo tardó demasiado. Probá otra vez.'}), 12000);
+  });
   updateLevel();
 })();

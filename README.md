@@ -19,3 +19,16 @@ Al abrir la puerta se intenta reproducir «Flores Amarillas» de Floricienta des
 Abrí `index.html` en un navegador. GitHub Pages publica la rama `main` desde `/(root)` en `https://peniamati.github.io/primavera-amarilla/`.
 
 Hecho en HTML, CSS y JavaScript. Las tipografías de Google Fonts tienen alternativas locales.
+
+## Reclamo de premios y aviso por correo
+
+Al superar los tres niveles aparece el botón de reclamo. Se escapa cinco veces, luego una ola de flores llena la pantalla y el visitante puede escribir su nombre para reclamar los tres premios simbólicos.
+
+La web pública **no guarda credenciales**. El archivo `apps-script.gs` es la función de Google Apps Script que envía el aviso al Gmail del dueño mediante `MailApp` (permiso de envío). Tiene destinatario fijo, un envío por minuto y un máximo de 30 por día. Antes de activar el correo:
+
+1. Crear un proyecto de Apps Script con `apps-script.gs`.
+2. En **Configuración del proyecto → Propiedades de script**, guardar `CLAIM_RECIPIENT` con el correo destinatario.
+3. Implementar como **Aplicación web**, ejecutar como propietario y permitir acceso **Cualquier persona**. Autorizar el permiso de envío de correo en Google.
+4. Pegar la URL pública `/exec` devuelta por Google en `config.js` como `SPRING_CLAIM_ENDPOINT` y publicar de nuevo.
+
+Hasta completar esa configuración, el botón final explica que el correo sigue pendiente de conexión; nunca finge haber enviado el aviso. La función pública puede recibir solicitudes de cualquier visitante, por eso fija el destinatario y limita los envíos. No uses contraseñas, claves ni tokens en `config.js`.

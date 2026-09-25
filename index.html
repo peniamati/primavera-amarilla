@@ -9,8 +9,9 @@
   <meta property="og:description" content="Las flores nunca se acaban. ¿Podés armar un ramo antes de que se termine el tiempo?">
   <meta property="og:type" content="website">
   <title>Primavera amarilla · Un jardín para jugar</title>
-  <link rel="stylesheet" href="styles.css?v=5">
-  <script src="script.js?v=5" defer></script>
+  <link rel="stylesheet" href="styles.css?v=6">
+  <script src="config.js?v=1" defer></script>
+  <script src="script.js?v=6" defer></script>
 </head>
 <body class="awaiting-entry">
   <div id="entry" class="entry" role="dialog" aria-modal="true" aria-labelledby="entryTitle">
@@ -65,6 +66,18 @@
       <div class="progress-track" role="progressbar" aria-label="Progreso del ramo" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0"><div id="progressBar"></div></div>
       <button id="startBtn" class="primary-btn modal-action" type="button">¡Empezar a juntar! <span aria-hidden="true">↗</span></button>
       <p class="game-state" id="gameState" aria-live="polite">Tocá las flores del jardín. ¡El primer premio es un abrazo!</p>
+    </div>
+  </div>
+  <div id="claimOverlay" class="claim-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="claimTitle">
+    <div class="claim-sky" id="claimSky">
+      <button id="claimClose" class="claim-close" type="button" aria-label="Cerrar y volver al jardín">×</button>
+      <div class="claim-intro"><span>BIEN, GANASTE LOS TRES PREMIOS</span><h2 id="claimTitle">¿Ahora los querés reclamar?</h2><p>Hay un botón por acá. Si lo alcanzás.</p></div>
+      <button id="claimRunBtn" class="claim-run" type="button">Reclamar premios ↗</button>
+      <div id="claimProgress" class="claim-progress" aria-live="polite" hidden><div class="claim-spinner" aria-hidden="true">✿</div><strong>Reclamando premio…</strong><span>Aguardá un instante 🌼</span></div>
+      <div id="flowerFlood" class="flower-flood" aria-hidden="true"></div>
+      <div id="claimFinal" class="claim-final" hidden>
+        <div class="claim-final-card"><span class="final-kicker">SORPRESA 🌼</span><h2>Jaja, ¿querías flores?<br><em>¡Tomá flores!</em></h2><p>Ahora sí podés reclamar tu abrazo, tu beso y tu salida a comer.</p><label for="claimName">¿Quién reclama los premios?</label><input id="claimName" type="text" maxlength="40" autocomplete="name" placeholder="Tu nombre" required><button id="sendClaimBtn" class="primary-btn" type="button">Ahora sí, reclamar ↗</button><p id="claimStatus" class="claim-status" role="status" aria-live="polite"></p></div>
+      </div>
     </div>
   </div>
   <div id="liveStatus" class="sr-only" role="status" aria-live="polite"></div>
