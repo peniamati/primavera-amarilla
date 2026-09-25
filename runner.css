@@ -50,6 +50,7 @@
 .runner-stage.mode-catch .runner-controls button{width:62px;height:62px}
 .flood-flower{background:url('yellow-daisy.webp') center/contain no-repeat;color:transparent!important;text-shadow:none!important}
 .flood-flower::after{display:none}
+@keyframes confettiLand{0%{transform:translate3d(var(--drift),-110vh,0) rotate(var(--twist));opacity:1}82%{transform:translate3d(0,8px,0) rotate(calc(var(--rest-angle) + 10deg))}100%{transform:translate3d(0,0,0) rotate(var(--rest-angle));opacity:1}}
 .claim-final{background:#f8f1d025;backdrop-filter:blur(1.5px)}
 @media(max-width:760px){.game-choice{margin:0 0 23px}.mode-picker button{min-height:95px;padding:12px}.mode-picker strong{font-size:13px}.mode-picker small{font-size:10px}.runner-girl{width:72px}.runner-controls{left:9px;right:9px;bottom:11px}.runner-controls button{width:52px;height:52px}.catch-bouquet{right:4px;top:85px;width:78px;height:124px}.catch-bouquet img{height:87px}}
 @media(max-width:350px){.mode-picker button{padding:9px}.mode-picker strong{font-size:12px}.runner-controls button{width:48px;height:48px}}

@@ -449,13 +449,15 @@
       for(let row=rows-1;row>=0;row--)for(let col=0;col<columns;col++){
         const flower=document.createElement('span');flower.className='flood-flower';
         flower.textContent=['✿','✽','✾'][Math.floor(Math.random()*3)];
-        flower.style.left=(col*cell-cell*.3+(Math.random()-.5)*15)+'px';
-        flower.style.top=(row*cell-cell*.3+(Math.random()-.5)*15)+'px';
-        flower.style.fontSize=(cell*(1.35+Math.random()*.32))+'px';
+        flower.style.left=(col*cell+(row%2)*cell*.35-cell*.45+(Math.random()-.5)*cell*.6)+'px';
+        flower.style.top=(row*cell-cell*.35+(Math.random()-.5)*cell*.6)+'px';
+        flower.style.fontSize=(cell*(1.18+Math.random()*.5))+'px';
+        flower.style.filter='brightness('+(0.88+Math.random()*.22).toFixed(2)+')';
         flower.style.setProperty('--drop-delay',(((rows-1-row)/rows*7.4+Math.random()*.55).toFixed(2))+'s');
         flower.style.setProperty('--drop-duration',(1.8+Math.random()*.9).toFixed(2)+'s');
         flower.style.setProperty('--drift',((Math.random()-.5)*160)+'px');
         flower.style.setProperty('--twist',((Math.random()-.5)*360)+'deg');
+        flower.style.setProperty('--rest-angle',((Math.random()-.5)*65)+'deg');
         fragment.appendChild(flower);
       }
       flood.appendChild(fragment);requestAnimationFrame(()=>flood.classList.add('rising'));
