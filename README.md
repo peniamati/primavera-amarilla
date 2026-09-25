@@ -1,14 +1,19 @@
 # Primavera amarilla 🌼
 
-Web móvil interactiva de primavera, sin instalación ni compilación. Una puerta de entrada abre una carrera de tres carriles con una chica rubia. Deslizá a izquierda o derecha (también hay botones y teclado) para juntar flores amarillas de 10 en 10 y esquivar macetas. La carrera tiene tres tramos con vales acumulativos:
+Web móvil interactiva de primavera, sin instalación ni compilación. Una puerta de entrada ofrece **dos juegos** con la misma sorpresa final:
 
-| Tramo | Objetivo acumulado | Tiempo máximo | Vale simbólico |
+- **Carrera de flores:** chica rubia en tres carriles. Deslizá a izquierda o derecha para cambiar de carril, arriba para saltar piedras y abajo para agacharte bajo ramas. Las flores doradas suman 10. Tiene tres tramos de hasta 65 segundos y se llega a los vales en 100, 200 y 300 flores acumuladas. El vale muestra el emoji del premio.
+- **Lluvia de flores:** movela a izquierda o derecha entre tres carriles para recoger las flores que caen y hacer crecer un ramo. Esquivá las macetas. Sus metas son 18, 26 y 34 flores; los tiempos máximos son 60, 70 y 80 segundos.
+
+Los dos juegos tienen tres vidas por tramo. Se puede reintentar el tramo actual sin perder los vales anteriores. Hay controles táctiles visibles y flechas de teclado como alternativa.
+
+| Tramo | Carrera | Lluvia | Vale simbólico |
 | --- | ---: | ---: | --- |
-| 1 | 100 flores | 35 s | Un abrazo |
-| 2 | 200 flores | 35 s | Un beso |
-| 3 | 300 flores | 35 s | Una salida a comer |
+| 1 | 100 flores | 18 flores | Un abrazo |
+| 2 | 200 flores | 26 flores | Un beso |
+| 3 | 300 flores | 34 flores | Una salida a comer |
 
-Cada tramo comienza con tres vidas; chocar con una maceta quita una. Al alcanzar el objetivo aparece el vale en el camino. Si falla, reintenta ese tramo desde el último vale. Los premios son mensajes divertidos para compartir, no cupones comerciales.
+Las flores y el ramo de aspecto natural son recursos WebP transparentes. Los premios son mensajes divertidos para compartir, no cupones comerciales.
 
 ## Música
 
@@ -22,7 +27,7 @@ Hecho en HTML, CSS y JavaScript. Las tipografías de Google Fonts tienen alterna
 
 ## Reclamo de premios y aviso por correo
 
-Al superar los tres niveles aparece el botón de reclamo. Se escapa cinco veces, luego caen flores amarillas como confeti y se acumulan desde abajo hasta llenar la pantalla. Ella puede reclamar los tres premios simbólicos sin completar ningún dato. El aviso identifica el reclamo como «Amor».
+Al superar los tres tramos de cualquiera de los juegos aparece el botón de reclamo. Se escapa cinco veces, luego caen flores amarillas como confeti y se acumulan desde abajo hasta llenar la pantalla. Ella puede reclamar los tres premios simbólicos sin completar ningún dato. El aviso identifica el reclamo como «Amor».
 
 La web pública **no guarda credenciales**. El archivo `apps-script.gs` es la función de Google Apps Script que envía el aviso al Gmail del dueño mediante `MailApp` (permiso de envío). Tiene destinatario fijo, un envío por minuto y un máximo de 30 por día. El proyecto publicado ya tiene la URL de implementación en `config.js`. Para instalar otra instancia:
 

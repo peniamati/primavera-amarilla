@@ -23,3 +23,33 @@
 @media(max-width:760px){.garden-wrap{margin:0 -10px}.runner-stage{border-radius:18px}.garden-wrap .garden-top,.garden-wrap .level-path,.garden-wrap .garden-bottom{margin-left:10px;margin-right:10px}.runner-hud{left:8px;right:8px;top:9px}.runner-hud span{font-size:11px;padding:8px 9px}.runner-callout{top:57px}.runner-controls button{width:59px;height:59px}.runner-girl{width:84px}}
 @media(max-width:360px){.runner-stage{min-height:400px}.runner-hud span{font-size:10px;padding:7px 6px;min-width:56px}.runner-girl{width:75px}.runner-controls button{width:54px;height:54px}}
 @media(prefers-reduced-motion:reduce){.runner-girl{animation:none!important;transition:none}}
+/* Two game modes share the same mobile stage and character. */
+.game-choice{max-width:680px;margin:0 auto 26px}
+.game-choice>span{display:block;color:#9b7040;font-size:10px;font-weight:800;letter-spacing:.16em;margin:0 0 10px}
+.mode-picker{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.mode-picker button{min-height:91px;border:1.5px solid #d8d7ae;border-radius:17px;background:#f9f5df;color:#294431;text-align:left;padding:14px 16px;box-shadow:0 4px 12px #29443112;transition:transform .16s,background .16s,border-color .16s}
+.mode-picker button.selected{background:#2f4e39;color:#fff7dc;border-color:#2f4e39;box-shadow:0 6px 0 #c1cd9c}
+.mode-picker button:active{transform:scale(.97)}
+.mode-picker strong{display:block;font-size:15px;line-height:1.2;margin-bottom:6px}
+.mode-picker small{display:block;font-size:11px;line-height:1.35;opacity:.75}
+.runner-girl{bottom:23%;width:clamp(68px,16vw,88px);transition:left .085s ease-out,filter .12s}
+.runner-stage.mode-catch .runner-girl{bottom:20%}
+.runner-controls{gap:8px}
+.runner-controls button{width:56px;height:56px;flex:none}
+.runner-stage.jumping .runner-girl{animation:runnerLeap .78s ease-in-out!important}
+.runner-stage.sliding .runner-girl{animation:runnerDuck .78s ease-in-out!important}
+@keyframes runnerLeap{0%,100%{transform:translateX(-50%) translateY(0)}42%{transform:translateX(-50%) translateY(-57px)}}
+@keyframes runnerDuck{0%,100%{transform:translateX(-50%) translateY(0) scaleY(1)}22%,78%{transform:translateX(-50%) translateY(18px) scaleY(.57)}}
+.catch-bouquet{position:absolute;z-index:7;top:96px;right:10px;width:92px;height:145px;display:none;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;color:#31533c;text-align:center;filter:drop-shadow(0 5px 8px #24452c45)}
+.catch-bouquet span{font-weight:800;font-size:9px;letter-spacing:.12em;background:#fffbe7db;padding:4px 7px;border-radius:20px}
+.catch-bouquet img{width:100%;height:107px;object-fit:contain;opacity:var(--bouquet-opacity,0);transform:scale(var(--bouquet-growth,.35));transition:transform .4s cubic-bezier(.2,1.3,.3,1),opacity .25s}
+.catch-bouquet strong{font-size:10px;background:#fffbe7db;padding:3px 8px;border-radius:20px}
+.runner-stage.mode-catch .catch-bouquet{display:flex}
+.runner-stage.mode-catch #laneJump,.runner-stage.mode-catch #laneSlide{display:none}
+.runner-stage.mode-catch .runner-controls{justify-content:space-between}
+.runner-stage.mode-catch .runner-controls button{width:62px;height:62px}
+.flood-flower{background:url('yellow-daisy.webp') center/contain no-repeat;color:transparent!important;text-shadow:none!important}
+.flood-flower::after{display:none}
+.claim-final{background:#f8f1d025;backdrop-filter:blur(1.5px)}
+@media(max-width:760px){.game-choice{margin:0 0 23px}.mode-picker button{min-height:95px;padding:12px}.mode-picker strong{font-size:13px}.mode-picker small{font-size:10px}.runner-girl{width:72px}.runner-controls{left:9px;right:9px;bottom:11px}.runner-controls button{width:52px;height:52px}.catch-bouquet{right:4px;top:85px;width:78px;height:124px}.catch-bouquet img{height:87px}}
+@media(max-width:350px){.mode-picker button{padding:9px}.mode-picker strong{font-size:12px}.runner-controls button{width:48px;height:48px}}

@@ -5,16 +5,21 @@
   const canvas = $('runnerCanvas');
   const ctx = canvas.getContext('2d');
   const modal = $('gameModal');
-  const levels = [
-    {name:'EL ABRAZO', prize:'un abrazo', emoji:'🫂', target:100, detail:'Vale por un abrazo de esos que hacen bien.'},
-    {name:'EL BESO', prize:'un beso', emoji:'💛', target:200, detail:'Vale por un beso. Siempre con ganas de los dos.'},
-    {name:'LA SALIDA', prize:'una salida a comer', emoji:'🍽️', target:300, detail:'Vale por una salida a comer. El lugar lo eligen ustedes.'}
+  const prizes=[
+    {name:'EL ABRAZO', prize:'un abrazo', emoji:'🫂', detail:'Vale por un abrazo de esos que hacen bien.'},
+    {name:'EL BESO', prize:'un beso', emoji:'💛', detail:'Vale por un beso. Siempre con ganas de los dos.'},
+    {name:'LA SALIDA', prize:'una salida a comer', emoji:'🍽️', detail:'Vale por una salida a comer. El lugar lo eligen ustedes.'}
   ];
-  let level=0, score=0, lives=3, timeLeft=35, lane=1, running=false, entered=false, musicOn=true;
-  let w=0,h=0,dpr=1,lastFrame=0,roadTime=0,spawnClock=.35,gateProgress=0,hitCooldown=0;
+  const runnerLevels=prizes.map((prize,i)=>({...prize,target:(i+1)*100,seconds:65}));
+  const catchLevels=prizes.map((prize,i)=>({...prize,target:[18,26,34][i],seconds:[60,70,80][i]}));
+  let mode='runner',levels=runnerLevels;
+  let level=0, score=0, lives=3, timeLeft=65, lane=1, running=false, entered=false, musicOn=true;
+  let w=0,h=0,dpr=1,lastFrame=0,roadTime=0,spawnClock=.35,gateProgress=0,hitCooldown=0,stageElapsed=0,action='',actionTime=0;
   let objects=[], lastFocus, messageTimeout, claimTimeout, claimStage=0, notificationPending=false;
   const random=(a,b)=>a+Math.random()*(b-a);
   const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
+  const daisy=new Image();daisy.src='yellow-daisy.webp';
+  const bouquetImage=new Image();bouquetImage.src='yellow-bouquet.webp';
 
   function setMusicState(on){
     musicOn=on;
@@ -45,6 +50,30 @@
     if(musicOn)loadMusic();else $('playerSlot').replaceChildren();
   });
 
+  function selectMode(next){
+    if(mode===next)return;
+    running=false;objects=[];gateProgress=0;stage.classList.remove('is-running','jumping','sliding');
+    if(!modal.hidden)closeModal();
+    mode=next;levels=mode==='runner'?runnerLevels:catchLevels;
+    level=0;score=0;lives=3;timeLeft=levels[0].seconds;lane=1;action='';
+    stage.classList.toggle('mode-catch',mode==='catch');setGirlPosition();
+    $('selectRunner').classList.toggle('selected',mode==='runner');
+    $('selectCatch').classList.toggle('selected',mode==='catch');
+    $('selectRunner').setAttribute('aria-pressed',String(mode==='runner'));
+    $('selectCatch').setAttribute('aria-pressed',String(mode==='catch'));
+    $('gameDescription').textContent=mode==='runner'
+      ?'En la carrera, deslizá a los costados para cambiar de carril, hacia arriba para saltar y hacia abajo para agacharte. Juntá flores de 10 en 10 y recorré los tres tramos hasta los vales.'
+      :'En la lluvia de flores, deslizá a izquierda o derecha para moverla entre tres carriles. Recogé las flores que caen para armar un ramo y esquivá las macetas. Tenés tres vidas en cada tramo.';
+    [1,2,3].forEach((n,i)=>{$('prizeGoal'+n).textContent=String(levels[i].target);});
+    $('gameFootnote').textContent=mode==='runner'?'🌼   10 FLORES POR CADA FLOR DORADA':'💐   ARMÁ EL RAMO MOVIÉNDOTE ENTRE CARRILES';
+    $('playBtn').textContent=mode==='runner'?'Empezar la carrera ↗':'Jugar con la lluvia de flores ↗';
+    $('runnerCallout').textContent=mode==='runner'?'Cada flor 🌼 suma 10':'Movete para recoger las flores 🌼';
+    $('gardenHint').textContent='Deslizá a izquierda o derecha';
+    updateLevel();draw();
+  }
+  $('selectRunner').addEventListener('click',()=>selectMode('runner'));
+  $('selectCatch').addEventListener('click',()=>selectMode('catch'));
+
   function resize(){
     const rect=stage.getBoundingClientRect();
     w=rect.width;h=rect.height;dpr=Math.min(devicePixelRatio||1,2);
@@ -54,7 +83,7 @@
   }
   new ResizeObserver(resize).observe(stage);
   function setGirlPosition(){
-    $('runnerGirl').style.left=(w/2+(lane-1)*w*.29)+'px';
+    $('runnerGirl').style.left=(w/2+(lane-1)*w*.265)+'px';
   }
   function move(direction){
     if(!running||gateProgress)return;
@@ -63,21 +92,33 @@
     lane=next;setGirlPosition();
     $('liveStatus').textContent='Carril '+['izquierdo','central','derecho'][lane];
   }
-  let pointerX=null;
-  stage.addEventListener('pointerdown',e=>{if(!running)return;pointerX=e.clientX;});
+  function startAction(next){
+    if(!running||mode!=='runner'||gateProgress)return;
+    action=next;actionTime=.78;
+    stage.classList.toggle('jumping',next==='jump');
+    stage.classList.toggle('sliding',next==='slide');
+    $('liveStatus').textContent=next==='jump'?'Saltando':'Agachándose';
+  }
+  let pointerX=null,pointerY=null;
+  stage.addEventListener('pointerdown',e=>{if(!running)return;pointerX=e.clientX;pointerY=e.clientY;});
   stage.addEventListener('pointerup',e=>{
     if(pointerX===null)return;
-    const dx=e.clientX-pointerX;pointerX=null;
-    if(Math.abs(dx)>30)move(dx>0?1:-1);
+    const dx=e.clientX-pointerX,dy=e.clientY-pointerY;pointerX=null;pointerY=null;
+    if(mode==='runner'&&Math.abs(dy)>34&&Math.abs(dy)>Math.abs(dx)*.9)startAction(dy<0?'jump':'slide');
+    else if(Math.abs(dx)>30)move(dx>0?1:-1);
   });
-  stage.addEventListener('pointercancel',()=>{pointerX=null;});
+  stage.addEventListener('pointercancel',()=>{pointerX=null;pointerY=null;});
   $('laneLeft').addEventListener('click',()=>move(-1));
   $('laneRight').addEventListener('click',()=>move(1));
+  $('laneJump').addEventListener('click',()=>startAction('jump'));
+  $('laneSlide').addEventListener('click',()=>startAction('slide'));
   document.addEventListener('keydown',e=>{
     if(e.key==='Escape'&&!modal.hidden)closeModal();
     if(!running)return;
     if(e.key==='ArrowLeft'||e.key==='a'){e.preventDefault();move(-1);}
     if(e.key==='ArrowRight'||e.key==='d'){e.preventDefault();move(1);}
+    if(e.key==='ArrowUp'||e.key==='w'){e.preventDefault();startAction('jump');}
+    if(e.key==='ArrowDown'||e.key==='s'){e.preventDefault();startAction('slide');}
   });
 
   function showMessage(message){
@@ -87,12 +128,12 @@
   }
   function updateLevel(){
     const current=levels[level];
-    $('levelTitle').textContent='TRAMO '+(level+1)+' · '+current.name+' '+current.emoji;
+    $('levelTitle').textContent=(mode==='runner'?'CARRERA':'LLUVIA')+' '+(level+1)+' · '+current.name+' '+current.emoji;
     $('levelPath').querySelectorAll('span').forEach((item,i)=>{
       item.classList.toggle('current',i===level);
       item.classList.toggle('done',i<level);
     });
-    $('modalKicker').textContent='TRAMO '+(level+1)+' DE 3 · '+current.name+' '+current.emoji;
+    $('modalKicker').textContent=(mode==='runner'?'CARRERA':'LLUVIA')+' '+(level+1)+' DE 3 · '+current.name+' '+current.emoji;
     document.querySelector('.progress-track').setAttribute('aria-valuemax',String(current.target));
     updateHUD();
   }
@@ -106,7 +147,10 @@
     $('hudLives').setAttribute('aria-label',lives+' de 3 vidas');
     $('hudTime').textContent=Math.ceil(timeLeft)+' s';
     document.querySelector('.progress-track').setAttribute('aria-valuenow',String(Math.min(score,target)));
-    $('progressBar').style.width=(clamp((score-level*100)/100,0,1)*100)+'%';
+    $('progressBar').style.width=(clamp(mode==='runner'?(score-level*100)/100:score/target,0,1)*100)+'%';
+    $('bouquetCount').textContent=score+' flores';
+    stage.style.setProperty('--bouquet-growth',String(.35+clamp(score/target,0,1)*.65));
+    stage.style.setProperty('--bouquet-opacity',score?'.98':'0');
   }
   function openModal(){
     lastFocus=document.activeElement;
@@ -117,33 +161,35 @@
     if(lastFocus?.focus)lastFocus.focus({preventScroll:true});
   }
   function startGame(){
-    running=true;score=level*100;lives=3;timeLeft=35;lane=1;objects=[];spawnClock=.4;gateProgress=0;hitCooldown=0;
+    running=true;score=mode==='runner'?level*100:0;lives=3;timeLeft=levels[level].seconds;
+    lane=1;objects=[];spawnClock=.4;gateProgress=0;hitCooldown=0;stageElapsed=0;action='';actionTime=0;
+    stage.classList.remove('jumping','sliding');
     updateLevel();setGirlPosition();closeModal();
     stage.classList.add('is-running');
     $('gardenHint').textContent='Deslizá · juntá '+levels[level].target+' flores';
-    $('runnerCallout').textContent='Cada flor 🌼 suma 10';
-    $('playBtn').textContent='Volver a la carrera ↗';
+    $('runnerCallout').textContent=mode==='runner'?'Cada flor 🌼 suma 10':'Cambiá de carril para recoger 🌼';
+    $('playBtn').textContent=mode==='runner'?'Volver a la carrera ↗':'Volver a las flores ↗';
     stage.scrollIntoView({behavior:'smooth',block:'center'});
     stage.focus({preventScroll:true});
-    showMessage('¡A correr por el vale! '+levels[level].emoji);
+    showMessage((mode==='runner'?'¡A correr por el vale! ':'¡A armar el ramo! ')+levels[level].emoji);
   }
   function endGame(won){
     if(!running)return;
-    running=false;gateProgress=0;objects=[];stage.classList.remove('is-running');
+    running=false;gateProgress=0;objects=[];stage.classList.remove('is-running','jumping','sliding');
     $('gardenHint').textContent='Deslizá a izquierda o derecha';
     const current=levels[level];
     updateHUD();
     if(won){
-      $('modalTitle').textContent='¡Llegaste al vale de '+current.prize+'! '+current.emoji;
+      $('modalTitle').textContent=(mode==='runner'?'¡Llegaste al vale de ':'¡Tu ramo ganó ')+current.prize+'! '+current.emoji;
       $('modalText').textContent=current.detail+' Juntaste '+score+' flores amarillas.';
-      $('gameState').textContent=level<2?'El próximo vale está en '+levels[level+1].target+' flores.':'¡Conseguiste los tres vales! Ahora viene la sorpresa.';
+      $('gameState').textContent=level<2?'El próximo vale pide '+levels[level+1].target+' flores.':'¡Conseguiste los tres vales! Ahora viene la sorpresa.';
       $('startBtn').textContent=level<2?'Ir al siguiente tramo ↗':'Reclamar premios ↗';
       if(level<2){level++;$('startBtn').onclick=startGame;}
       else $('startBtn').onclick=openClaim;
     }else{
       $('modalTitle').textContent=lives?'¡Casi llegás al vale! 🌼':'¡Uy, una maceta! 🌼';
       $('modalText').textContent=(lives?'Se terminó este tramo.':'Se terminaron las tres vidas.')+' Juntaste '+score+' de '+current.target+' flores.';
-      $('gameState').textContent='Reintentás este tramo desde '+(level*100)+' flores; los vales anteriores ya son tuyos.';
+      $('gameState').textContent='Reintentás este tramo desde '+(mode==='runner'?level*100:0)+' flores; los vales anteriores ya son tuyos.';
       $('startBtn').textContent='Reintentar tramo '+(level+1)+' ↗';
       $('startBtn').onclick=startGame;
     }
@@ -153,12 +199,14 @@
     if(running){stage.scrollIntoView({behavior:'smooth',block:'center'});return;}
     if(level>=3)level=0;
     const current=levels[level];
-    score=level*100;lives=3;timeLeft=35;
+    score=mode==='runner'?level*100:0;lives=3;timeLeft=levels[level].seconds;
     updateLevel();
-    $('modalTitle').textContent='Una carrera para vos.';
-    $('modalText').textContent='Deslizá a izquierda o derecha para cambiar de carril. Juntá flores de 10 en 10 y esquivá las macetas.';
+    $('modalTitle').textContent=mode==='runner'?'Una carrera para vos.':'Una lluvia para vos.';
+    $('modalText').textContent=mode==='runner'
+      ?'Deslizá a los costados para cambiar de carril; arriba para saltar, abajo para agacharte. Juntá flores y esquivá macetas, piedras y ramas.'
+      :'Deslizá a izquierda o derecha para recoger las flores que caen en tu carril y armar el ramo. Esquivá las macetas.';
     $('gameState').textContent='Tu vale de '+current.target+' flores: '+current.prize+'. Tenés tres vidas.';
-    $('startBtn').textContent='¡Empezar a correr! ↗';
+    $('startBtn').textContent=mode==='runner'?'¡Empezar a correr! ↗':'¡Empezar a juntar! ↗';
     $('startBtn').onclick=startGame;
     openModal();
   });
@@ -166,8 +214,9 @@
   document.querySelector('.modal-backdrop').addEventListener('click',closeModal);
 
   function spawnObject(){
-    const bad=Math.random()<(.08+level*.02);
-    objects.push({lane:Math.floor(Math.random()*3),p:-.08,kind:bad?'pot':'flower',twist:random(-.25,.25)});
+    const bad=Math.random()<(mode==='runner'?.13+level*.02:.10+level*.015);
+    const hazards=mode==='runner'?['pot','rock','branch']:['pot'];
+    objects.push({lane:Math.floor(Math.random()*3),p:-.08,kind:bad?hazards[Math.floor(Math.random()*hazards.length)]:'flower',twist:random(-.25,.25)});
   }
   function project(l,p){
     const depth=clamp(p,0,1);
@@ -177,30 +226,67 @@
   function update(dt){
     roadTime+=dt*(running?2.2:.28);
     if(!running)return;
+    stageElapsed+=dt;
+    if(actionTime>0){actionTime=Math.max(0,actionTime-dt);if(!actionTime){action='';stage.classList.remove('jumping','sliding');}}
     if(gateProgress){
-      gateProgress+=dt/2.8;
+      gateProgress+=dt/(mode==='runner'?2.8:2.3);
       if(gateProgress>=1)endGame(true);
       return;
     }
     timeLeft=Math.max(0,timeLeft-dt);
     hitCooldown=Math.max(0,hitCooldown-dt);
+    if(mode==='catch'){updateCatch(dt);return;}
+    if(score>=levels[level].target){
+      objects=[];
+      if(stageElapsed>=33){gateProgress=.001;$('runnerCallout').textContent='¡Ahí está tu vale! '+levels[level].emoji;}
+      updateHUD();return;
+    }
     spawnClock-=dt;
     if(spawnClock<=0){spawnObject();spawnClock=.55+Math.random()*.13;}
-    for(const item of objects)item.p+=dt*(.30+level*.015);
-    while(objects.length&&objects[0].p>.91){
+    for(const item of objects)item.p+=dt*(.32+level*.01);
+    while(objects.length&&objects[0].p>.84){
       const item=objects.shift();
       if(item.lane!==lane)continue;
       if(item.kind==='flower'){
         score=Math.min(levels[level].target,score+10);
         showMessage('¡+10 flores! 🌼');
         if(score>=levels[level].target){
-          gateProgress=.001;objects=[];$('runnerCallout').textContent='¡Ahí está tu vale! ✨';
-          showMessage('¡Llegaste a '+score+'! Corré hacia el vale');
+          objects=[];$('runnerCallout').textContent='¡'+score+' flores! Seguí hasta el vale ✨';
+          showMessage('¡Llegaste a '+score+'! Seguí corriendo');
         }
-      }else if(hitCooldown<=0){
+      }else if(hitCooldown<=0 && !(item.kind==='rock'&&action==='jump'&&actionTime>0)
+        && !(item.kind==='branch'&&action==='slide'&&actionTime>0)){
         lives--;hitCooldown=1.1;
         stage.classList.add('hit');setTimeout(()=>stage.classList.remove('hit'),430);
-        showMessage(lives?'¡Cuidado con la maceta! '+lives+' vidas':'¡Se terminaron las vidas!');
+        showMessage(lives?'¡Obstáculo! '+lives+' vidas':'¡Se terminaron las vidas!');
+        if(lives<=0){updateHUD();endGame(false);return;}
+      }else if(item.kind!=='flower'){
+        showMessage(item.kind==='rock'?'¡Gran salto! ✨':'¡Lo esquivaste! ✨');
+      }
+    }
+    updateHUD();
+    if(timeLeft<=0&&!gateProgress)endGame(false);
+  }
+  function updateCatch(dt){
+    if(score>=levels[level].target){
+      objects=[];
+      if(stageElapsed>=28){gateProgress=.001;$('runnerCallout').textContent='¡Ramo terminado! '+levels[level].emoji;}
+      updateHUD();return;
+    }
+    spawnClock-=dt;
+    if(spawnClock<=0){spawnObject();spawnClock=.43+Math.random()*.1;}
+    for(const item of objects)item.p+=dt*(.38+level*.025);
+    while(objects.length&&objects[0].p>.78){
+      const item=objects.shift();
+      if(item.lane!==lane)continue;
+      if(item.kind==='flower'){
+        score=Math.min(levels[level].target,score+1);
+        showMessage('¡Una flor más para el ramo! 🌼');
+        if(score>=levels[level].target){objects=[];$('runnerCallout').textContent='¡Ramo completo! 💐';}
+      }else if(hitCooldown<=0){
+        lives--;hitCooldown=1;
+        stage.classList.add('hit');setTimeout(()=>stage.classList.remove('hit'),430);
+        showMessage(lives?'¡Una maceta! '+lives+' vidas':'¡Se terminaron las vidas!');
         if(lives<=0){updateHUD();endGame(false);return;}
       }
     }
@@ -209,6 +295,10 @@
   }
 
   function drawFlower(x,y,s,angle=0){
+    if(daisy.complete&&daisy.naturalWidth){
+      ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.shadowColor='#71542480';ctx.shadowBlur=9;ctx.shadowOffsetY=5;
+      const size=54*s;ctx.drawImage(daisy,-size/2,-size/2,size,size);ctx.restore();return;
+    }
     ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.scale(s,s);
     ctx.shadowColor='#b77f2588';ctx.shadowBlur=10;ctx.shadowOffsetY=4;
     for(let i=0;i<8;i++){ctx.save();ctx.rotate(i*Math.PI/4);ctx.fillStyle=i%2?'#ffd454':'#f7c22f';ctx.beginPath();ctx.ellipse(0,-13,7.8,13,0,0,Math.PI*2);ctx.fill();ctx.restore();}
@@ -223,9 +313,51 @@
     ctx.shadowBlur=0;ctx.strokeStyle='#466d3f';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(0,-13);ctx.lineTo(0,-37);ctx.stroke();
     ctx.fillStyle='#729958';ctx.beginPath();ctx.ellipse(-9,-30,11,5,-.6,0,Math.PI*2);ctx.ellipse(9,-37,11,5,.6,0,Math.PI*2);ctx.fill();ctx.restore();
   }
+  function drawRock(x,y,s){
+    ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.shadowColor='#463a3380';ctx.shadowBlur=9;ctx.shadowOffsetY=4;
+    ctx.fillStyle='#777d69';ctx.beginPath();ctx.moveTo(-25,17);ctx.lineTo(-17,-10);ctx.lineTo(-3,-21);ctx.lineTo(17,-13);ctx.lineTo(26,17);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#b1b7a1';ctx.beginPath();ctx.moveTo(-17,-10);ctx.lineTo(-3,-21);ctx.lineTo(17,-13);ctx.lineTo(5,-6);ctx.closePath();ctx.fill();ctx.restore();
+  }
+  function drawBranch(x,y,s){
+    ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.shadowColor='#254c3680';ctx.shadowBlur=8;ctx.shadowOffsetY=4;
+    ctx.fillStyle='#698547';ctx.beginPath();ctx.roundRect(-29,-29,58,11,5);ctx.fill();
+    ctx.fillStyle='#4d703d';ctx.beginPath();ctx.ellipse(-19,-30,17,9,-.3,0,Math.PI*2);ctx.ellipse(19,-30,17,9,.3,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#735e3f';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-27,-21);ctx.lineTo(27,-21);ctx.stroke();ctx.restore();
+  }
+  function drawCatch(){
+    const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#fff2d6');sky.addColorStop(.75,'#d6ebc3');sky.addColorStop(1,'#8fbb76');
+    ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
+    ctx.fillStyle='#ffe58a';ctx.beginPath();ctx.arc(w*.22,h*.16,Math.max(24,w*.064),0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#9fca85';ctx.beginPath();ctx.moveTo(0,h*.8);ctx.quadraticCurveTo(w*.5,h*.67,w,h*.8);ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.fill();
+    for(let i=0;i<2;i++){
+      const x=w*(i+1)/3;ctx.strokeStyle='#faf7dc99';ctx.lineWidth=3;ctx.setLineDash([9,15]);
+      ctx.beginPath();ctx.moveTo(x,h*.18);ctx.lineTo(x,h*.94);ctx.stroke();ctx.setLineDash([]);
+    }
+    for(let i=0;i<13;i++){
+      const x=((i*87+roadTime*11)%(w+40))-20;
+      drawFlower(x,h*.92+Math.sin(i*3)*13,.23,i);
+    }
+    for(const item of objects){
+      if(item.p<0)continue;
+      const x=w/2+(item.lane-1)*w*.265;
+      const y=h*.07+item.p*h*.86;
+      const scale=(.52+item.p*.62)*(w<370?.86:1);
+      if(item.kind==='flower')drawFlower(x,y,scale,item.twist+item.p*1.2);
+      else drawPot(x,y,scale);
+    }
+    if(gateProgress){
+      ctx.save();ctx.globalAlpha=Math.min(1,gateProgress*2);
+      if(bouquetImage.complete&&bouquetImage.naturalWidth){
+        const height=Math.min(h*.5,270),width=height*2/3;
+        ctx.drawImage(bouquetImage,w/2-width/2,h*.22,width,height);
+      }
+      ctx.restore();
+    }
+  }
   function draw(){
     if(!w||!h)return;
     ctx.setTransform(dpr,0,0,dpr,0,0);
+    if(mode==='catch'){drawCatch();return;}
     const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#fff1ca');sky.addColorStop(.43,'#d6e8be');sky.addColorStop(1,'#a5cc82');
     ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
     ctx.fillStyle='#ffdc72';ctx.beginPath();ctx.arc(w*.76,h*.14,Math.max(25,w*.065),0,Math.PI*2);ctx.fill();
@@ -257,7 +389,9 @@
       const pos=project(item.lane,item.p);
       const size=pos.scale*(w<400?.78:1);
       if(item.kind==='flower')drawFlower(pos.x,pos.y,Math.min(size,1.55),item.twist+roadTime*.65);
-      else drawPot(pos.x,pos.y,Math.min(size,1.5));
+      else if(item.kind==='pot')drawPot(pos.x,pos.y,Math.min(size,1.5));
+      else if(item.kind==='rock')drawRock(pos.x,pos.y,Math.min(size,1.5));
+      else drawBranch(pos.x,pos.y,Math.min(size,1.5));
     }
     if(gateProgress){
       const pos=project(1,Math.min(.91,gateProgress*.92));
@@ -265,7 +399,8 @@
       ctx.save();ctx.translate(pos.x,pos.y);ctx.scale(scale,scale);
       ctx.fillStyle='#fff8de';ctx.strokeStyle='#d6a740';ctx.lineWidth=5;
       ctx.beginPath();ctx.roundRect(-63,-95,126,70,16);ctx.fill();ctx.stroke();
-      ctx.fillStyle='#2d5037';ctx.font='bold 19px Georgia';ctx.textAlign='center';ctx.fillText('VALE '+levels[level].target,0,-54);
+      ctx.fillStyle='#2d5037';ctx.font='bold 14px Georgia';ctx.textAlign='center';ctx.fillText('TU VALE',0,-77);
+      ctx.font='35px sans-serif';ctx.fillText(levels[level].emoji,0,-37);
       drawFlower(-49,-20,.45);drawFlower(49,-20,.45);
       ctx.restore();
     }
@@ -297,7 +432,7 @@
   }
   function closeClaim(){
     clearTimeout(claimTimeout);$('claimOverlay').hidden=true;document.body.style.overflow='';
-    $('playBtn').textContent='Jugar otra vez ↗';level=0;score=0;lives=3;timeLeft=35;updateLevel();$('playBtn').focus();
+    $('playBtn').textContent='Jugar otra vez ↗';level=0;score=0;lives=3;timeLeft=levels[0].seconds;updateLevel();$('playBtn').focus();
   }
   $('claimClose').addEventListener('click',closeClaim);
   $('claimRunBtn').addEventListener('click',()=>{
