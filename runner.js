@@ -129,9 +129,10 @@
   }
   function endGame(won){
     if(!running)return;
-    running=false;stage.classList.remove('is-running');
+    running=false;gateProgress=0;objects=[];stage.classList.remove('is-running');
     $('gardenHint').textContent='Deslizá a izquierda o derecha';
     const current=levels[level];
+    updateHUD();
     if(won){
       $('modalTitle').textContent='¡Llegaste al vale de '+current.prize+'! '+current.emoji;
       $('modalText').textContent=current.detail+' Juntaste '+score+' flores amarillas.';
@@ -146,7 +147,7 @@
       $('startBtn').textContent='Reintentar tramo '+(level+1)+' ↗';
       $('startBtn').onclick=startGame;
     }
-    updateHUD();showMessage($('modalTitle').textContent);openModal();
+    showMessage($('modalTitle').textContent);openModal();
   }
   $('playBtn').addEventListener('click',()=>{
     if(running){stage.scrollIntoView({behavior:'smooth',block:'center'});return;}
@@ -165,7 +166,7 @@
   document.querySelector('.modal-backdrop').addEventListener('click',closeModal);
 
   function spawnObject(){
-    const bad=Math.random()<(.12+level*.025);
+    const bad=Math.random()<(.08+level*.02);
     objects.push({lane:Math.floor(Math.random()*3),p:-.08,kind:bad?'pot':'flower',twist:random(-.25,.25)});
   }
   function project(l,p){
