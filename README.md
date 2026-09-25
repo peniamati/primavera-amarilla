@@ -1,6 +1,6 @@
 # Primavera amarilla 🌼
 
-Una pequeña web interactiva de primavera. Las flores amarillas crecen continuamente y se pueden tocar; el desafío consiste en juntar 12 flores en 30 segundos mientras se esquivan los yuyos.
+Una pequeña web interactiva de primavera. Una puerta da paso al jardín y carga «Flores Amarillas» de Floricienta mediante un reproductor visible de YouTube. Las flores amarillas crecen continuamente y se pueden tocar; el desafío consiste en juntar 12 flores en 30 segundos mientras se esquivan los yuyos. El botón de música apaga o vuelve a cargar el video (al encenderlo, la canción comienza desde el principio). Algunos navegadores bloquean la reproducción automática, por lo que el visitante puede tocar ▶ en el video.
 
 ## Uso
 

@@ -11,7 +11,6 @@
   let spawnTimer = null;
   let flowerId = 0;
   let musicOn = true;
-  let playerReady = false;
   let entered = false;
   let messageTimeout;
   let lastFocus;
@@ -19,13 +18,9 @@
   function setMusicState(on) {
     musicOn = on;
     $('soundBtn').setAttribute('aria-pressed', String(on));
-    $('soundBtn').setAttribute('aria-label', on ? 'Pausar música' : 'Reanudar música');
-    $('soundLabel').textContent = `Música: ${on ? 'sí' : 'no'}`;
+    $('soundBtn').setAttribute('aria-label', on ? 'Apagar música' : 'Encender música');
+    $('soundLabel').textContent = on ? 'Apagar música' : 'Encender música';
     $('soundIcon').textContent = on ? '♫' : '♪';
-  }
-  function playerCommand(command) {
-    const frame = $('youtubePlayer');
-    if (frame?.contentWindow) frame.contentWindow.postMessage(JSON.stringify({event:'command',func:command,args:[]}), 'https://www.youtube.com');
   }
   function loadMusic() {
     const iframe = document.createElement('iframe');
@@ -35,16 +30,7 @@
     iframe.referrerPolicy = 'strict-origin-when-cross-origin';
     iframe.src = 'https://www.youtube.com/embed/gv63CGCx6vg?enablejsapi=1&autoplay=1&playsinline=1&controls=1&rel=0';
     $('playerSlot').appendChild(iframe);
-    setTimeout(() => { if (!playerReady) setMusicState(false); }, 5000);
   }
-  window.addEventListener('message', (event) => {
-    if (!/^https:\/\/(www\.)?youtube\.com$/.test(event.origin)) return;
-    try {
-      const data = JSON.parse(event.data);
-      if (data.event === 'onReady') { playerReady = true; if (musicOn) playerCommand('playVideo'); }
-      if (data.event === 'onStateChange') { if (data.info === 1) setMusicState(true); if (data.info === 2 || data.info === 5) setMusicState(false); }
-    } catch (_) { /* Ignore unrelated messages. */ }
-  });
   $('enterBtn').addEventListener('click', () => {
     if (entered) return;
     entered = true;
@@ -176,10 +162,7 @@
   $('soundBtn').addEventListener('click', () => {
     if (!entered) return;
     setMusicState(!musicOn);
-    if (playerReady) playerCommand(musicOn ? 'playVideo' : 'pauseVideo');
-    else {
-      // The visible YouTube player remains available if browser autoplay is restricted.
-      playerCommand(musicOn ? 'playVideo' : 'pauseVideo');
-    }
+    if (musicOn) loadMusic();
+    else $('playerSlot').replaceChildren();
   });
 })();
