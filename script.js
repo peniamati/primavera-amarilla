@@ -35,13 +35,14 @@
     iframe.referrerPolicy = 'strict-origin-when-cross-origin';
     iframe.src = 'https://www.youtube.com/embed/gv63CGCx6vg?enablejsapi=1&autoplay=1&playsinline=1&controls=1&rel=0';
     $('playerSlot').appendChild(iframe);
+    setTimeout(() => { if (!playerReady) setMusicState(false); }, 5000);
   }
   window.addEventListener('message', (event) => {
     if (!/^https:\/\/(www\.)?youtube\.com$/.test(event.origin)) return;
     try {
       const data = JSON.parse(event.data);
       if (data.event === 'onReady') { playerReady = true; if (musicOn) playerCommand('playVideo'); }
-      if (data.event === 'onStateChange') { if (data.info === 1) setMusicState(true); if (data.info === 2) setMusicState(false); }
+      if (data.event === 'onStateChange') { if (data.info === 1) setMusicState(true); if (data.info === 2 || data.info === 5) setMusicState(false); }
     } catch (_) { /* Ignore unrelated messages. */ }
   });
   $('enterBtn').addEventListener('click', () => {
