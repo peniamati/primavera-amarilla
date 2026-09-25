@@ -11,9 +11,9 @@
   <title>Primavera amarilla · Un jardín para jugar</title>
   <link rel="stylesheet" href="styles.css?v=8">
   <link rel="stylesheet" href="game-animations.css?v=2">
-  <link rel="stylesheet" href="runner.css?v=3">
+  <link rel="stylesheet" href="runner.css?v=4">
   <script src="config.js?v=3" defer></script>
-  <script src="runner.js?v=4" defer></script>
+  <script src="runner.js?v=5" defer></script>
 </head>
 <body class="awaiting-entry">
   <div id="entry" class="entry" role="dialog" aria-modal="true" aria-labelledby="entryTitle">
@@ -46,17 +46,17 @@
       <div class="level-path" id="levelPath" aria-label="Niveles del juego"><span class="current">1 · Abrazo</span><span>2 · Beso</span><span>3 · Cena</span></div>
       <div id="runnerStage" class="runner-stage" tabindex="0" aria-label="Juego de tres carriles; deslizá a izquierda o derecha para cambiar de carril">
         <canvas id="runnerCanvas" aria-hidden="true"></canvas>
-        <div class="runner-hud" id="playHud"><span id="hudFlowers">🌼 0 / 100</span><span id="hudLives" aria-label="Tres vidas">♥ ♥ ♥</span><span id="hudTime">35 s</span></div>
-        <div id="runnerCallout" class="runner-callout" aria-live="polite">Cada flor 🌼 suma 10</div>
+        <div class="runner-hud" id="playHud"><span id="hudFlowers">🌼 0 / 100</span><span id="hudLives" aria-label="Tres vidas">♥ ♥ ♥</span><span id="hudTime">75 s</span></div>
+        <div id="runnerCallout" class="runner-callout" aria-live="polite">Cada flor 🌼 suma 5</div>
         <img id="runnerGirl" class="runner-girl" src="runner-girl.svg" alt="" draggable="false">
         <div id="bouquetDisplay" class="catch-bouquet" aria-label="Ramo en construcción"><span>TU RAMO</span><img src="yellow-bouquet.webp" alt="" draggable="false"><strong id="bouquetCount">0 flores</strong></div>
         <div id="runnerMessage" class="runner-message" role="status" aria-live="polite"></div>
         <div class="runner-controls"><button id="laneLeft" type="button" aria-label="Mover a la izquierda">←</button><button id="laneJump" type="button" aria-label="Saltar">↑</button><button id="laneSlide" type="button" aria-label="Agacharse">↓</button><button id="laneRight" type="button" aria-label="Mover a la derecha">→</button></div>
       </div>
-      <div class="garden-bottom"><span id="gameFootnote">🌼 &nbsp; 10 FLORES POR CADA FLOR DORADA</span><span>EDICIÓN PRIMAVERA</span></div>
+      <div class="garden-bottom"><span id="gameFootnote">🌼 &nbsp; 5 FLORES POR CADA FLOR DORADA</span><span>EDICIÓN PRIMAVERA</span></div>
     </section>
 
-    <section class="game-info" aria-label="Cómo jugar"><div class="game-number">DOS JUEGOS · TRES VALES</div><div><h2>Flores que valen planes.</h2><p id="gameDescription">En la carrera, deslizá a los costados para cambiar de carril, hacia arriba para saltar y hacia abajo para agacharte. Juntá flores doradas de 10 en 10, esquivá los obstáculos y llegá a 100, 200 y 300 flores.</p><div class="prize-list"><div><span id="prizeGoal1">100</span><strong>Un abrazo</strong><small>El que dura un poquito más.</small></div><div><span id="prizeGoal2">200</span><strong>Un beso</strong><small>Con permiso, por supuesto.</small></div><div><span id="prizeGoal3">300</span><strong>Una salida a comer</strong><small>El menú lo eligen ustedes.</small></div></div></div><span class="info-doodle" aria-hidden="true">✺</span></section>
+    <section class="game-info" aria-label="Cómo jugar"><div class="game-number">DOS JUEGOS · TRES VALES</div><div><h2>Flores que valen planes.</h2><p id="gameDescription">En la carrera, deslizá a los costados para cambiar de carril, hacia arriba para saltar vallas y hacia abajo para pasar bajo los muros. Juntá flores doradas de 5 en 5 hasta los vales de 100, 200 y 300 flores.</p><div class="prize-list"><div><span id="prizeGoal1">100</span><strong>Un abrazo</strong><small>El que dura un poquito más.</small></div><div><span id="prizeGoal2">200</span><strong>Un beso</strong><small>Con permiso, por supuesto.</small></div><div><span id="prizeGoal3">300</span><strong>Una salida a comer</strong><small>El menú lo eligen ustedes.</small></div></div></div><span class="info-doodle" aria-hidden="true">✺</span></section>
     <footer>Hecho con ☀ y un poquito de código. <span>Que tengas un lindo día.</span></footer>
   </main>
 
@@ -70,7 +70,7 @@
       <div class="score-row"><div><span>FLORES</span><strong id="scoreValue">0 / 100</strong></div><div><span>VIDAS</span><strong id="livesValue">♥ ♥ ♥</strong></div></div>
       <div class="progress-track" role="progressbar" aria-label="Progreso hacia el vale" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="progressBar"></div></div>
       <button id="startBtn" class="primary-btn modal-action" type="button">¡Empezar a correr! <span aria-hidden="true">↗</span></button>
-      <p class="game-state" id="gameState" aria-live="polite">Cada flor dorada suma 10. Tu primer vale espera al juntar 100.</p>
+      <p class="game-state" id="gameState" aria-live="polite">Cada flor dorada suma 5. Tu primer vale espera al juntar 100.</p>
     </div>
   </div>
   <div id="claimOverlay" class="claim-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="claimTitle">

@@ -32,12 +32,12 @@
 .mode-picker button:active{transform:scale(.97)}
 .mode-picker strong{display:block;font-size:15px;line-height:1.2;margin-bottom:6px}
 .mode-picker small{display:block;font-size:11px;line-height:1.35;opacity:.75}
-.runner-girl{bottom:23%;width:clamp(68px,16vw,88px);transition:left .085s ease-out,filter .12s}
+.runner-girl{bottom:23%;width:clamp(68px,16vw,88px);transition:left .04s ease-out,filter .12s}
 .runner-stage.mode-catch .runner-girl{bottom:20%}
 .runner-controls{gap:8px}
 .runner-controls button{width:56px;height:56px;flex:none}
-.runner-stage.jumping .runner-girl{animation:runnerLeap .78s ease-in-out!important}
-.runner-stage.sliding .runner-girl{animation:runnerDuck .78s ease-in-out!important}
+.runner-stage.jumping .runner-girl{animation:runnerLeap .62s ease-in-out!important}
+.runner-stage.sliding .runner-girl{animation:runnerDuck .62s ease-in-out!important}
 @keyframes runnerLeap{0%,100%{transform:translateX(-50%) translateY(0)}42%{transform:translateX(-50%) translateY(-57px)}}
 @keyframes runnerDuck{0%,100%{transform:translateX(-50%) translateY(0) scaleY(1)}22%,78%{transform:translateX(-50%) translateY(18px) scaleY(.57)}}
 .catch-bouquet{position:absolute;z-index:7;top:96px;right:10px;width:92px;height:145px;display:none;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;color:#31533c;text-align:center;filter:drop-shadow(0 5px 8px #24452c45)}

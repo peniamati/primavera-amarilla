@@ -10,12 +10,12 @@
     {name:'EL BESO', prize:'un beso', emoji:'💛', detail:'Vale por un beso. Siempre con ganas de los dos.'},
     {name:'LA SALIDA', prize:'una salida a comer', emoji:'🍽️', detail:'Vale por una salida a comer. El lugar lo eligen ustedes.'}
   ];
-  const runnerLevels=prizes.map((prize,i)=>({...prize,target:(i+1)*100,seconds:65}));
-  const catchLevels=prizes.map((prize,i)=>({...prize,target:[18,26,34][i],seconds:[60,70,80][i]}));
+  const runnerLevels=prizes.map((prize,i)=>({...prize,target:(i+1)*100,seconds:75}));
+  const catchLevels=prizes.map((prize,i)=>({...prize,target:[22,30,38][i],seconds:[70,80,90][i]}));
   let mode='runner',levels=runnerLevels;
-  let level=0, score=0, lives=3, timeLeft=65, lane=1, running=false, entered=false, musicOn=true;
+  let level=0, score=0, lives=3, timeLeft=75, lane=1, running=false, entered=false, musicOn=true;
   let w=0,h=0,dpr=1,lastFrame=0,roadTime=0,spawnClock=.35,gateProgress=0,hitCooldown=0,stageElapsed=0,action='',actionTime=0;
-  let objects=[], lastFocus, messageTimeout, claimTimeout, claimStage=0, notificationPending=false;
+  let objects=[], lastFocus, messageTimeout, claimTimeout, claimStage=0, notificationPending=false, hudSnapshot='';
   const random=(a,b)=>a+Math.random()*(b-a);
   const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
   const daisy=new Image();daisy.src='yellow-daisy.webp';
@@ -62,12 +62,12 @@
     $('selectRunner').setAttribute('aria-pressed',String(mode==='runner'));
     $('selectCatch').setAttribute('aria-pressed',String(mode==='catch'));
     $('gameDescription').textContent=mode==='runner'
-      ?'En la carrera, deslizá a los costados para cambiar de carril, hacia arriba para saltar y hacia abajo para agacharte. Juntá flores de 10 en 10 y recorré los tres tramos hasta los vales.'
+      ?'En la carrera, deslizá a los costados para cambiar de carril, hacia arriba para saltar las vallas y hacia abajo para pasar bajo los muros. Juntá flores de 5 en 5 hasta los vales.'
       :'En la lluvia de flores, deslizá a izquierda o derecha para moverla entre tres carriles. Recogé las flores que caen para armar un ramo y esquivá las macetas. Tenés tres vidas en cada tramo.';
     [1,2,3].forEach((n,i)=>{$('prizeGoal'+n).textContent=String(levels[i].target);});
-    $('gameFootnote').textContent=mode==='runner'?'🌼   10 FLORES POR CADA FLOR DORADA':'💐   ARMÁ EL RAMO MOVIÉNDOTE ENTRE CARRILES';
+    $('gameFootnote').textContent=mode==='runner'?'🌼   5 FLORES POR CADA FLOR DORADA':'💐   ARMÁ EL RAMO MOVIÉNDOTE ENTRE CARRILES';
     $('playBtn').textContent=mode==='runner'?'Empezar la carrera ↗':'Jugar con la lluvia de flores ↗';
-    $('runnerCallout').textContent=mode==='runner'?'Cada flor 🌼 suma 10':'Movete para recoger las flores 🌼';
+    $('runnerCallout').textContent=mode==='runner'?'Cada flor 🌼 suma 5':'Movete para recoger las flores 🌼';
     $('gardenHint').textContent='Deslizá a izquierda o derecha';
     updateLevel();draw();
   }
@@ -94,7 +94,7 @@
   }
   function startAction(next){
     if(!running||mode!=='runner'||gateProgress)return;
-    action=next;actionTime=.78;
+    action=next;actionTime=.62;
     stage.classList.toggle('jumping',next==='jump');
     stage.classList.toggle('sliding',next==='slide');
     $('liveStatus').textContent=next==='jump'?'Saltando':'Agachándose';
@@ -139,6 +139,9 @@
   }
   function updateHUD(){
     const target=levels[level].target;
+    const snapshot=[mode,level,score,lives,Math.ceil(timeLeft)].join('|');
+    if(snapshot===hudSnapshot)return;
+    hudSnapshot=snapshot;
     $('scoreValue').textContent=score+' / '+target;
     $('hudFlowers').textContent='🌼 '+score+' / '+target;
     const hearts='♥ '.repeat(lives)+'♡ '.repeat(3-lives);
@@ -167,7 +170,7 @@
     updateLevel();setGirlPosition();closeModal();
     stage.classList.add('is-running');
     $('gardenHint').textContent='Deslizá · juntá '+levels[level].target+' flores';
-    $('runnerCallout').textContent=mode==='runner'?'Cada flor 🌼 suma 10':'Cambiá de carril para recoger 🌼';
+    $('runnerCallout').textContent=mode==='runner'?'Cada flor 🌼 suma 5':'Cambiá de carril para recoger 🌼';
     $('playBtn').textContent=mode==='runner'?'Volver a la carrera ↗':'Volver a las flores ↗';
     stage.scrollIntoView({behavior:'smooth',block:'center'});
     stage.focus({preventScroll:true});
@@ -203,7 +206,7 @@
     updateLevel();
     $('modalTitle').textContent=mode==='runner'?'Una carrera para vos.':'Una lluvia para vos.';
     $('modalText').textContent=mode==='runner'
-      ?'Deslizá a los costados para cambiar de carril; arriba para saltar, abajo para agacharte. Juntá flores y esquivá macetas, piedras y ramas.'
+      ?'Deslizá a los costados para cambiar de carril; arriba para saltar vallas y abajo para pasar bajo los muros. Cada flor suma 5.'
       :'Deslizá a izquierda o derecha para recoger las flores que caen en tu carril y armar el ramo. Esquivá las macetas.';
     $('gameState').textContent='Tu vale de '+current.target+' flores: '+current.prize+'. Tenés tres vidas.';
     $('startBtn').textContent=mode==='runner'?'¡Empezar a correr! ↗':'¡Empezar a juntar! ↗';
@@ -215,7 +218,7 @@
 
   function spawnObject(){
     const bad=Math.random()<(mode==='runner'?.13+level*.02:.10+level*.015);
-    const hazards=mode==='runner'?['pot','rock','branch']:['pot'];
+    const hazards=mode==='runner'?['fence','arch']:['pot'];
     objects.push({lane:Math.floor(Math.random()*3),p:-.08,kind:bad?hazards[Math.floor(Math.random()*hazards.length)]:'flower',twist:random(-.25,.25)});
   }
   function project(l,p){
@@ -224,12 +227,12 @@
     return{x:w/2+(l-1)*spread*.62,y:h*.23+(h*.72)*Math.pow(depth,1.45),scale:.38+depth*1.25};
   }
   function update(dt){
-    roadTime+=dt*(running?2.2:.28);
+    roadTime+=dt*(running?3.2:.28);
     if(!running)return;
     stageElapsed+=dt;
     if(actionTime>0){actionTime=Math.max(0,actionTime-dt);if(!actionTime){action='';stage.classList.remove('jumping','sliding');}}
     if(gateProgress){
-      gateProgress+=dt/(mode==='runner'?2.8:2.3);
+      gateProgress+=dt/(mode==='runner'?1.15:.95);
       if(gateProgress>=1)endGame(true);
       return;
     }
@@ -238,30 +241,28 @@
     if(mode==='catch'){updateCatch(dt);return;}
     if(score>=levels[level].target){
       objects=[];
-      if(stageElapsed>=33){gateProgress=.001;$('runnerCallout').textContent='¡Ahí está tu vale! '+levels[level].emoji;}
+      gateProgress=.001;$('runnerCallout').textContent='¡Ahí está tu vale! '+levels[level].emoji;
       updateHUD();return;
     }
     spawnClock-=dt;
-    if(spawnClock<=0){spawnObject();spawnClock=.55+Math.random()*.13;}
-    for(const item of objects)item.p+=dt*(.32+level*.01);
+    if(spawnClock<=0){spawnObject();spawnClock=.43+Math.random()*.1;}
+    for(const item of objects)item.p+=dt*(.45+level*.02);
     while(objects.length&&objects[0].p>.84){
       const item=objects.shift();
       if(item.lane!==lane)continue;
       if(item.kind==='flower'){
-        score=Math.min(levels[level].target,score+10);
-        showMessage('¡+10 flores! 🌼');
+        score=Math.min(levels[level].target,score+5);
         if(score>=levels[level].target){
-          objects=[];$('runnerCallout').textContent='¡'+score+' flores! Seguí hasta el vale ✨';
-          showMessage('¡Llegaste a '+score+'! Seguí corriendo');
+          objects=[];gateProgress=.001;$('runnerCallout').textContent='¡Ahí está tu vale! '+levels[level].emoji;
         }
-      }else if(hitCooldown<=0 && !(item.kind==='rock'&&action==='jump'&&actionTime>0)
-        && !(item.kind==='branch'&&action==='slide'&&actionTime>0)){
+      }else if(hitCooldown<=0 && !(item.kind==='fence'&&action==='jump'&&actionTime>0)
+        && !(item.kind==='arch'&&action==='slide'&&actionTime>0)){
         lives--;hitCooldown=1.1;
         stage.classList.add('hit');setTimeout(()=>stage.classList.remove('hit'),430);
         showMessage(lives?'¡Obstáculo! '+lives+' vidas':'¡Se terminaron las vidas!');
         if(lives<=0){updateHUD();endGame(false);return;}
       }else if(item.kind!=='flower'){
-        showMessage(item.kind==='rock'?'¡Gran salto! ✨':'¡Lo esquivaste! ✨');
+        showMessage(item.kind==='fence'?'¡Gran salto! ✨':'¡Pasaste por abajo! ✨');
       }
     }
     updateHUD();
@@ -270,19 +271,18 @@
   function updateCatch(dt){
     if(score>=levels[level].target){
       objects=[];
-      if(stageElapsed>=28){gateProgress=.001;$('runnerCallout').textContent='¡Ramo terminado! '+levels[level].emoji;}
+      gateProgress=.001;$('runnerCallout').textContent='¡Ramo terminado! '+levels[level].emoji;
       updateHUD();return;
     }
     spawnClock-=dt;
     if(spawnClock<=0){spawnObject();spawnClock=.43+Math.random()*.1;}
-    for(const item of objects)item.p+=dt*(.38+level*.025);
+    for(const item of objects)item.p+=dt*(.52+level*.025);
     while(objects.length&&objects[0].p>.78){
       const item=objects.shift();
       if(item.lane!==lane)continue;
       if(item.kind==='flower'){
         score=Math.min(levels[level].target,score+1);
-        showMessage('¡Una flor más para el ramo! 🌼');
-        if(score>=levels[level].target){objects=[];$('runnerCallout').textContent='¡Ramo completo! 💐';}
+        if(score>=levels[level].target){objects=[];gateProgress=.001;$('runnerCallout').textContent='¡Ramo completo! 💐';}
       }else if(hitCooldown<=0){
         lives--;hitCooldown=1;
         stage.classList.add('hit');setTimeout(()=>stage.classList.remove('hit'),430);
@@ -313,16 +313,18 @@
     ctx.shadowBlur=0;ctx.strokeStyle='#466d3f';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(0,-13);ctx.lineTo(0,-37);ctx.stroke();
     ctx.fillStyle='#729958';ctx.beginPath();ctx.ellipse(-9,-30,11,5,-.6,0,Math.PI*2);ctx.ellipse(9,-37,11,5,.6,0,Math.PI*2);ctx.fill();ctx.restore();
   }
-  function drawRock(x,y,s){
-    ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.shadowColor='#463a3380';ctx.shadowBlur=9;ctx.shadowOffsetY=4;
-    ctx.fillStyle='#777d69';ctx.beginPath();ctx.moveTo(-25,17);ctx.lineTo(-17,-10);ctx.lineTo(-3,-21);ctx.lineTo(17,-13);ctx.lineTo(26,17);ctx.closePath();ctx.fill();
-    ctx.fillStyle='#b1b7a1';ctx.beginPath();ctx.moveTo(-17,-10);ctx.lineTo(-3,-21);ctx.lineTo(17,-13);ctx.lineTo(5,-6);ctx.closePath();ctx.fill();ctx.restore();
+  function drawFence(x,y,s){
+    ctx.save();ctx.translate(x,y);ctx.scale(s,s);
+    ctx.fillStyle='#744d32';ctx.fillRect(-27,-14,7,37);ctx.fillRect(20,-14,7,37);
+    ctx.fillStyle='#c38b56';ctx.beginPath();ctx.roundRect(-31,-15,62,12,3);ctx.roundRect(-28,3,56,9,2);ctx.fill();
+    ctx.strokeStyle='#f1ce96';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-25,-12);ctx.lineTo(25,-12);ctx.stroke();ctx.restore();
   }
-  function drawBranch(x,y,s){
-    ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.shadowColor='#254c3680';ctx.shadowBlur=8;ctx.shadowOffsetY=4;
-    ctx.fillStyle='#698547';ctx.beginPath();ctx.roundRect(-29,-29,58,11,5);ctx.fill();
-    ctx.fillStyle='#4d703d';ctx.beginPath();ctx.ellipse(-19,-30,17,9,-.3,0,Math.PI*2);ctx.ellipse(19,-30,17,9,.3,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle='#735e3f';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-27,-21);ctx.lineTo(27,-21);ctx.stroke();ctx.restore();
+  function drawArch(x,y,s){
+    ctx.save();ctx.translate(x,y);ctx.scale(s,s);
+    ctx.fillStyle='#8b7260';ctx.fillRect(-34,-52,11,64);ctx.fillRect(23,-52,11,64);
+    ctx.fillStyle='#bb9676';ctx.beginPath();ctx.roundRect(-38,-54,76,24,4);ctx.fill();
+    ctx.fillStyle='#d5b597';ctx.fillRect(-35,-51,70,5);
+    ctx.fillStyle='#506b4d';ctx.beginPath();ctx.ellipse(-22,-54,11,5,0,0,Math.PI*2);ctx.ellipse(22,-54,11,5,0,0,Math.PI*2);ctx.fill();ctx.restore();
   }
   function drawCatch(){
     const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#fff2d6');sky.addColorStop(.75,'#d6ebc3');sky.addColorStop(1,'#8fbb76');
@@ -365,8 +367,8 @@
     ctx.fillStyle='#a7ca86';ctx.beginPath();ctx.moveTo(0,h*.26);ctx.quadraticCurveTo(w*.26,h*.13,w*.53,h*.27);ctx.quadraticCurveTo(w*.8,h*.16,w,h*.24);ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.fill();
     ctx.fillStyle='#75a262';ctx.beginPath();ctx.moveTo(0,h*.43);ctx.quadraticCurveTo(w*.25,h*.24,w*.5,h*.39);ctx.quadraticCurveTo(w*.82,h*.28,w,h*.38);ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.fill();
     // Moving roadside blossoms make the track feel like a spring garden.
-    for(let i=0;i<24;i++){
-      const p=((i/24+roadTime*.11)%1);
+    for(let i=0;i<10;i++){
+      const p=((i/10+roadTime*.11)%1);
       const y=h*.26+h*.72*Math.pow(p,1.45);
       const half=w*(.13+.38*Math.pow(p,1.5));
       const x=w/2+(i%2?-1:1)*(half+9+p*11);
@@ -390,8 +392,8 @@
       const size=pos.scale*(w<400?.78:1);
       if(item.kind==='flower')drawFlower(pos.x,pos.y,Math.min(size,1.55),item.twist+roadTime*.65);
       else if(item.kind==='pot')drawPot(pos.x,pos.y,Math.min(size,1.5));
-      else if(item.kind==='rock')drawRock(pos.x,pos.y,Math.min(size,1.5));
-      else drawBranch(pos.x,pos.y,Math.min(size,1.5));
+      else if(item.kind==='fence')drawFence(pos.x,pos.y,Math.min(size,1.5));
+      else drawArch(pos.x,pos.y,Math.min(size,1.5));
     }
     if(gateProgress){
       const pos=project(1,Math.min(.91,gateProgress*.92));
@@ -406,7 +408,7 @@
     }
   }
   function frame(now){
-    const dt=lastFrame?Math.min((now-lastFrame)/1000,.05):0;
+    const dt=lastFrame?Math.min((now-lastFrame)/1000,.12):0;
     lastFrame=now;
     if(!document.hidden){update(dt);draw();}
     requestAnimationFrame(frame);

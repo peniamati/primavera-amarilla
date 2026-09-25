@@ -2,16 +2,16 @@
 
 Web móvil interactiva de primavera, sin instalación ni compilación. Una puerta de entrada ofrece **dos juegos** con la misma sorpresa final:
 
-- **Carrera de flores:** chica rubia en tres carriles. Deslizá a izquierda o derecha para cambiar de carril, arriba para saltar piedras y abajo para agacharte bajo ramas. Las flores doradas suman 10. Tiene tres tramos de hasta 65 segundos y se llega a los vales en 100, 200 y 300 flores acumuladas. El vale muestra el emoji del premio.
-- **Lluvia de flores:** movela a izquierda o derecha entre tres carriles para recoger las flores que caen y hacer crecer un ramo. Esquivá las macetas. Sus metas son 18, 26 y 34 flores; los tiempos máximos son 60, 70 y 80 segundos.
+- **Carrera de flores:** chica rubia en tres carriles. Deslizá a izquierda o derecha para cambiar de carril, arriba para saltar vallas y abajo para agacharte bajo muros con un paso libre. Cada flor dorada suma 5: juntá 100, 200 y 300 flores acumuladas para alcanzar los vales del abrazo, el beso y la cena. El vale aparece apenas completás la meta. Cada tramo dura hasta 75 segundos.
+- **Lluvia de flores:** movela a izquierda o derecha entre tres carriles para recoger las flores que caen y hacer crecer un ramo. Esquivá las macetas. Sus metas son 22, 30 y 38 flores; los tiempos máximos son 70, 80 y 90 segundos.
 
 Los dos juegos tienen tres vidas por tramo. Se puede reintentar el tramo actual sin perder los vales anteriores. Hay controles táctiles visibles y flechas de teclado como alternativa.
 
 | Tramo | Carrera | Lluvia | Vale simbólico |
 | --- | ---: | ---: | --- |
-| 1 | 100 flores | 18 flores | Un abrazo |
-| 2 | 200 flores | 26 flores | Un beso |
-| 3 | 300 flores | 34 flores | Una salida a comer |
+| 1 | 100 flores | 22 flores | Un abrazo |
+| 2 | 200 flores | 30 flores | Un beso |
+| 3 | 300 flores | 38 flores | Una salida a comer |
 
 Las flores y el ramo de aspecto natural son recursos WebP transparentes. Los premios son mensajes divertidos para compartir, no cupones comerciales.
 
