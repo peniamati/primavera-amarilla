@@ -1,0 +1,30 @@
+/* Mobile catching game: falling targets and a bouquet that grows flower by flower. */
+.fall-field{position:absolute;inset:0;z-index:8;pointer-events:none;overflow:hidden}
+.fall-item{position:absolute;top:-80px;width:66px;height:66px;margin-left:-33px;display:grid;place-items:center;border:0;border-radius:50%;background:#fff8dbd9;box-shadow:0 8px 20px #233c2b30;font-size:42px;line-height:1;touch-action:manipulation;pointer-events:auto;user-select:none;animation:flowerFall var(--fall-duration) linear forwards;will-change:transform}
+.fall-item.yellow-bloom{background:#fff9dce8;box-shadow:0 0 0 4px #fff8c95c,0 8px 21px #785e2329}
+.fall-item.intruder{background:#f6e9dfed;font-size:38px}
+.fall-item.caught{animation:catchBloom .34s ease-out forwards;pointer-events:none}
+@keyframes flowerFall{from{transform:translate3d(0,0,0) rotate(-16deg)}50%{transform:translate3d(var(--sway-distance),240px,0) rotate(15deg)}to{transform:translate3d(0,calc(var(--garden-height, 410px) + 100px),0) rotate(35deg)}}
+@keyframes catchBloom{to{transform:scale(.1) rotate(55deg);opacity:0}}
+.garden{--garden-height:clamp(350px,36vw,530px)}
+.bouquet{position:absolute;z-index:9;bottom:4px;left:50%;width:124px;height:138px;transform:translateX(-50%);pointer-events:none;text-align:center;filter:drop-shadow(0 8px 8px #243f2444)}
+.bouquet-flowers{position:absolute;bottom:61px;left:50%;width:0;height:0;z-index:2}
+.bouquet-bloom{position:absolute;left:-20px;top:-20px;font-size:36px;line-height:1;transform:translate(var(--x),var(--y)) rotate(var(--r));animation:bouquetPop .35s cubic-bezier(.2,1.6,.3,1) both}
+@keyframes bouquetPop{from{opacity:0;scale:.15}to{opacity:1;scale:1}}
+.bouquet-wrap{position:absolute;bottom:19px;left:29px;width:66px;height:66px;padding-top:37px;background:linear-gradient(145deg,#f7e4a4,#d4b870);clip-path:polygon(0 0,100% 0,68% 100%,32% 100%);color:#80643d;font-size:16px}
+.bouquet-label{position:absolute;bottom:0;left:0;right:0;color:#fff8d7;font-size:9px;letter-spacing:.15em;font-weight:700}
+.garden.ouch{animation:ouch .3s ease}
+@keyframes ouch{50%{box-shadow:inset 0 0 0 12px #db755c}}
+.play-hud{gap:5px;align-items:center}.play-hud span{white-space:nowrap}.play-hud #hudLives{color:#d55955;letter-spacing:1px}
+@media(max-width:760px){.garden{--garden-height:min(54vh,435px)}.fall-item{width:62px;height:62px;margin-left:-31px;font-size:40px}.play-hud{font-size:11px}.play-hud span{padding:8px 9px}.garden-message{top:65px}.bouquet{bottom:1px}}
+@media(max-width:380px){.garden{--garden-height:340px}.play-hud{font-size:10px}.play-hud span{padding:7px 6px}}
+
+/* Individual blossoms land from the bottom upward, like accumulating confetti. */
+.flower-flood{height:100%;background:transparent;transition:none;pointer-events:none}
+.flower-flood:not(.rising){display:none}
+.flower-flood.rising{height:100%}
+.flood-flower{position:absolute;width:1em;height:1em;display:grid;place-items:center;line-height:1;font-family:Georgia,serif;color:#f3bf24;text-shadow:2px 3px 0 #d99a21,-2px -2px 0 #ffe588,0 5px 10px #85601b66;transform-origin:center;animation:confettiLand var(--drop-duration) cubic-bezier(.21,.78,.38,1) var(--drop-delay) both;will-change:transform}
+.flood-flower::after{content:"";position:absolute;top:47%;left:47%;width:.13em;height:.13em;border-radius:50%;background:#a86b28;opacity:.75}
+@keyframes confettiLand{0%{transform:translate3d(var(--drift),-110vh,0) rotate(var(--twist));opacity:1}82%{transform:translate3d(0,8px,0) rotate(12deg)}100%{transform:translate3d(0,0,0) rotate(0deg);opacity:1}}
+.claim-progress{z-index:8;text-shadow:0 2px 10px #fff9de}
+@media(prefers-reduced-motion:reduce){.fall-item{animation-duration:4s!important}.flood-flower{animation-duration:.01ms!important;animation-delay:var(--drop-delay)!important}}

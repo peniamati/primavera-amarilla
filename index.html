@@ -9,9 +9,10 @@
   <meta property="og:description" content="Las flores nunca se acaban. ¿Podés armar un ramo antes de que se termine el tiempo?">
   <meta property="og:type" content="website">
   <title>Primavera amarilla · Un jardín para jugar</title>
-  <link rel="stylesheet" href="styles.css?v=7">
-  <script src="config.js?v=1" defer></script>
-  <script src="script.js?v=7" defer></script>
+  <link rel="stylesheet" href="styles.css?v=8">
+  <link rel="stylesheet" href="game-animations.css?v=1">
+  <script src="config.js?v=2" defer></script>
+  <script src="script.js?v=8" defer></script>
 </head>
 <body class="awaiting-entry">
   <div id="entry" class="entry" role="dialog" aria-modal="true" aria-labelledby="entryTitle">
@@ -38,20 +39,22 @@
     <div id="playerSlot" class="player-slot" aria-hidden="true"></div>
 
     <section class="garden-wrap" aria-label="Jardín interactivo de flores amarillas">
-      <div class="garden-top"><span id="levelTitle">NIVEL 1 · EL ABRAZO 🌼</span><span id="gardenHint">Tocá las flores amarillas</span></div>
+      <div class="garden-top"><span id="levelTitle">NIVEL 1 · EL ABRAZO 🌼</span><span id="gardenHint">Atrapá las flores que caen</span></div>
       <div class="level-path" id="levelPath" aria-label="Niveles del juego"><span class="current">1 · Abrazo</span><span>2 · Beso</span><span>3 · Cena</span></div>
-      <div class="play-hud" id="playHud" hidden><span id="hudFlowers">🌼 0 / 8</span><span id="hudTime">⏱ 25 s</span></div>
+      <div class="play-hud" id="playHud" hidden><span id="hudFlowers">🌼 0 / 8</span><span id="hudLives" aria-label="Tres vidas">♥ ♥ ♥</span><span id="hudTime">⏱ 25 s</span></div>
       <div id="garden" class="garden">
         <div class="sun" aria-hidden="true"><div class="sun-face">ᴗ</div></div>
         <div class="cloud cloud-one" aria-hidden="true"></div><div class="cloud cloud-two" aria-hidden="true"></div>
         <div id="flowerField" class="flower-field"></div>
+        <div id="fallField" class="fall-field" aria-label="Objetos que caen"></div>
         <div class="hill hill-back" aria-hidden="true"></div><div class="hill hill-front" aria-hidden="true"></div>
+        <div id="bouquet" class="bouquet" aria-label="Ramo vacío"><div id="bouquetFlowers" class="bouquet-flowers" aria-hidden="true"></div><div class="bouquet-wrap" aria-hidden="true">✦</div><span class="bouquet-label">TU RAMO</span></div>
         <div class="garden-message" id="gardenMessage" aria-live="polite"></div>
       </div>
       <div class="garden-bottom"><span>🌼 &nbsp; FLORES ILIMITADAS, BUEN HUMOR TAMBIÉN</span><span>EDICIÓN PRIMAVERA</span></div>
     </section>
 
-    <section class="game-info" aria-label="Cómo jugar"><div class="game-number">TRES NIVELES · TRES PREMIOS</div><div><h2>Flores que valen planes.</h2><p>Juntá las flores amarillas antes de que se termine el tiempo y esquivá los yuyos. Cada nivel desbloquea un vale simbólico para compartir con alguien especial.</p><div class="prize-list"><div><span>01</span><strong>Un abrazo</strong><small>El que dura un poquito más.</small></div><div><span>02</span><strong>Un beso</strong><small>Con permiso, por supuesto.</small></div><div><span>03</span><strong>Una salida a comer</strong><small>El menú lo eligen ustedes.</small></div></div></div><span class="info-doodle" aria-hidden="true">✺</span></section>
+    <section class="game-info" aria-label="Cómo jugar"><div class="game-number">TRES NIVELES · TRES PREMIOS</div><div><h2>Flores que valen planes.</h2><p>Las flores caen del cielo: tocá las amarillas para armar tu ramo. Si tocás un objeto intruso, perdés una de tus tres vidas. Las flores que se escapan no te quitan vidas. Cada nivel desbloquea un premio.</p><div class="prize-list"><div><span>01</span><strong>Un abrazo</strong><small>El que dura un poquito más.</small></div><div><span>02</span><strong>Un beso</strong><small>Con permiso, por supuesto.</small></div><div><span>03</span><strong>Una salida a comer</strong><small>El menú lo eligen ustedes.</small></div></div></div><span class="info-doodle" aria-hidden="true">✺</span></section>
     <footer>Hecho con ☀ y un poquito de código. <span>Que tengas un lindo día.</span></footer>
   </main>
 
@@ -61,11 +64,11 @@
       <button id="closeBtn" class="close-btn" type="button" aria-label="Cerrar juego">×</button>
       <div class="modal-kicker" id="modalKicker">NIVEL 1 · EL ABRAZO 🌼</div>
       <h2 id="modalTitle">Cada flor cuenta.</h2>
-      <p id="modalText">Juntá flores amarillas antes de que se acabe el tiempo. Los yuyos restan dos.</p>
+      <p id="modalText">Tocá las flores amarillas que caen. Tenés tres vidas: evitá los objetos intrusos.</p>
       <div class="score-row"><div><span>FLORES</span><strong id="scoreValue">0 / 8</strong></div><div><span>TIEMPO</span><strong id="timeValue">25s</strong></div></div>
       <div class="progress-track" role="progressbar" aria-label="Progreso del ramo" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0"><div id="progressBar"></div></div>
       <button id="startBtn" class="primary-btn modal-action" type="button">¡Empezar a juntar! <span aria-hidden="true">↗</span></button>
-      <p class="game-state" id="gameState" aria-live="polite">Tocá las flores del jardín. ¡El primer premio es un abrazo!</p>
+      <p class="game-state" id="gameState" aria-live="polite">Tocá las flores que caen. ¡El primer premio es un abrazo!</p>
     </div>
   </div>
   <div id="claimOverlay" class="claim-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="claimTitle">

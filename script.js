@@ -1,16 +1,16 @@
 (() => {
   'use strict';
   const $ = (id) => document.getElementById(id);
-  const field = $('flowerField');
+  const fallField = $('fallField');
   const modal = $('gameModal');
   const levels = [
     { name: 'EL ABRAZO', prize: 'Un abrazo', emoji: '🫂', goal: 8, seconds: 25, weeds: .09, detail: 'Vale por un abrazo de esos que hacen bien.' },
     { name: 'EL BESO', prize: 'Un beso', emoji: '💛', goal: 12, seconds: 28, weeds: .18, detail: 'Vale por un beso. Siempre con ganas de los dos.' },
     { name: 'LA SALIDA', prize: 'Una salida a comer', emoji: '🍽️', goal: 16, seconds: 32, weeds: .26, detail: 'Vale por una salida a comer. El lugar lo eligen ustedes.' }
   ];
-  let level = 0, score = 0, remaining = levels[0].seconds;
+  let level = 0, score = 0, lives = 3, remaining = levels[0].seconds;
   let playing = false, entered = false, musicOn = true;
-  let timer, spawnTimer, messageTimeout, lastFocus, flowerId = 0;
+  let timer, spawnTimer, messageTimeout, lastFocus, flowerId = 0, claimTimeout;
   let claimStage = 0, notificationPending = false;
 
   function setMusicState(on) {
@@ -65,43 +65,62 @@
     $('scoreValue').textContent = `${score} / ${current.goal}`;
     $('timeValue').textContent = `${remaining}s`;
     $('hudFlowers').textContent = `🌼 ${score} / ${current.goal}`;
+    $('hudLives').textContent = `${'♥ '.repeat(lives)}${'♡ '.repeat(3 - lives)}`.trim();
+    $('hudLives').setAttribute('aria-label', `${lives} de 3 vidas`);
     $('hudTime').textContent = `⏱ ${remaining} s`;
     document.querySelector('.progress-track').setAttribute('aria-valuenow', String(Math.min(score,current.goal)));
     $('progressBar').style.width = `${Math.min(100, score / current.goal * 100)}%`;
   }
-  function buildFlower(weed = false) {
-    const flower = document.createElement('button');
-    flower.type = 'button';
-    flower.className = `flower${weed ? ' weed' : ''}`;
-    flower.setAttribute('aria-label', weed ? 'Yuyo: quita dos flores' : 'Flor amarilla: sumar al ramo');
-    flower.id = `flower-${++flowerId}`;
-    const scale = .86 + Math.random() * .36;
-    flower.style.setProperty('--left', `${7 + Math.random() * 86}%`);
-    flower.style.setProperty('--bottom', `${7 + Math.random() * 23}%`);
-    flower.style.setProperty('--height', `${95 + Math.random() * 65}px`);
-    flower.style.setProperty('--scale', scale.toFixed(2));
-    flower.style.setProperty('--depth', String(Math.round(2 + scale * 5)));
-    flower.style.setProperty('--sway', `${2.5 + Math.random() * 2}s`);
-    flower.style.setProperty('--tilt', `${(Math.random() - .5) * 22}deg`);
-    flower.innerHTML = `<span class="stem"></span><span class="leaf"></span><span class="leaf left"></span><span class="head">${Array.from({length:8}, (_, i) => `<span class="petal" style="--i:${i}"></span>`).join('')}<span class="center"></span></span>`;
-    flower.addEventListener('click', () => pickFlower(flower, weed));
-    field.appendChild(flower);
-    while (field.children.length > (matchMedia('(max-width: 760px)').matches ? 18 : 24)) field.firstElementChild.remove();
+  // Each falling object is a large touch target. Missed flowers never cost a life.
+  const intruders = ['🪨', '🧦', '🐛', '☂️', '🍄'];
+  function addToBouquet() {
+    const bloom = document.createElement('span');
+    bloom.className = 'bouquet-bloom';
+    bloom.textContent = '🌼';
+    const index = $('bouquetFlowers').childElementCount;
+    bloom.style.setProperty('--x', `${(index % 5 - 2) * 20 + (Math.random() - .5) * 10}px`);
+    bloom.style.setProperty('--y', `${-Math.floor(index / 5) * 13 + (index % 2) * 9}px`);
+    bloom.style.setProperty('--r', `${(index % 5 - 2) * 10}deg`);
+    $('bouquetFlowers').appendChild(bloom);
+    $('bouquet').setAttribute('aria-label', `Ramo con ${score} flores`);
   }
-  function pickFlower(flower, weed) {
-    if (flower.classList.contains('pop')) return;
-    flower.classList.add('pop');
-    flower.disabled = true;
-    setTimeout(() => flower.remove(), 320);
-    if (!playing) { showMessage(weed ? 'Un yuyo infiltrado 🌿' : 'Una flor para vos 💛'); return; }
-    score = Math.max(0, score + (weed ? -2 : 1));
-    showMessage(weed ? '¡Uy, un yuyo! −2 🌿' : ['¡Una más! 🌼','¡Ese ramo promete! ✨','¡Flor sumada! 💛'][score % 3]);
-    updateScore();
-    $('liveStatus').textContent = `${score} de ${levels[level].goal} flores, ${remaining} segundos`;
-    if (score >= levels[level].goal) endGame(true);
+  function spawnFalling() {
+    if (!playing) return;
+    const bad = Math.random() < levels[level].weeds;
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = `fall-item ${bad ? 'intruder' : 'yellow-bloom'}`;
+    item.id = `fall-${++flowerId}`;
+    item.setAttribute('aria-label', bad ? 'Objeto intruso: perdés una vida' : 'Flor amarilla: atraparla para el ramo');
+    item.textContent = bad ? intruders[Math.floor(Math.random() * intruders.length)] : '🌼';
+    item.style.left = `${9 + Math.random() * 82}%`;
+    const duration = Math.max(2.9, 4.3 - level * .35 + Math.random() * .6);
+    item.style.setProperty('--fall-duration', `${duration}s`);
+    item.style.setProperty('--sway-distance', `${(Math.random() - .5) * 45}px`);
+    item.addEventListener('animationend', () => item.remove(), {once:true});
+    item.addEventListener('click', () => {
+      if (!playing || item.disabled) return;
+      item.disabled = true;
+      item.classList.add('caught');
+      setTimeout(() => item.remove(), 350);
+      if (bad) {
+        lives--;
+        $('garden').classList.remove('ouch');
+        void $('garden').offsetWidth;
+        $('garden').classList.add('ouch');
+        showMessage(lives ? `¡Uy! Te quedan ${lives} vidas 💚` : '¡Se terminaron las vidas!');
+        if (!lives) { updateScore(); endGame(false); return; }
+      } else {
+        score++;
+        addToBouquet();
+        showMessage(['¡Una más para el ramo! 🌼','¡Qué lindo va quedando! ✨','¡Flor atrapada! 💛'][score % 3]);
+      }
+      updateScore();
+      $('liveStatus').textContent = `${score} de ${levels[level].goal} flores, ${lives} vidas, ${remaining} segundos`;
+      if (score >= levels[level].goal) endGame(true);
+    });
+    fallField.appendChild(item);
   }
-  for (let i = 0; i < (matchMedia('(max-width: 760px)').matches ? 10 : 15); i++) buildFlower();
-  spawnTimer = setInterval(() => buildFlower(playing && Math.random() < levels[level].weeds), 620);
 
   function openModal() {
     lastFocus = document.activeElement;
@@ -116,17 +135,24 @@
   }
   function startGame() {
     clearInterval(timer);
+    clearInterval(spawnTimer);
     playing = true;
     score = 0;
+    lives = 3;
     remaining = levels[level].seconds;
-    field.querySelectorAll('.weed').forEach(flower => flower.remove());
+    fallField.replaceChildren();
+    $('bouquetFlowers').replaceChildren();
+    $('bouquet').setAttribute('aria-label', 'Ramo vacío');
     updateLevel();
     $('playHud').hidden = false;
-    $('gardenHint').textContent = `Juntá ${levels[level].goal} flores y esquivá los yuyos`;
+    $('garden').classList.add('playing');
+    $('gardenHint').textContent = `Atrapá ${levels[level].goal} flores · 3 vidas`;
     $('playBtn').textContent = 'Volver al jardín ↗';
     closeModal();
     $('garden').scrollIntoView({behavior:'smooth',block:'center'});
     showMessage(`¡Nivel ${level+1}: a jugar! ${levels[level].emoji}`);
+    spawnFalling();
+    spawnTimer = setInterval(spawnFalling, [580,510,450][level]);
     timer = setInterval(() => {
       remaining--;
       updateScore();
@@ -137,9 +163,11 @@
     if (!playing) return;
     playing = false;
     clearInterval(timer);
+    clearInterval(spawnTimer);
+    fallField.replaceChildren();
+    $('garden').classList.remove('playing');
     $('playHud').hidden = true;
-    field.querySelectorAll('.weed').forEach(flower => flower.remove());
-    $('gardenHint').textContent = 'Tocá las flores amarillas';
+    $('gardenHint').textContent = 'Atrapá las flores que caen';
     const current = levels[level];
     if (won) {
       $('modalTitle').textContent = `¡Ganaste ${current.prize.toLowerCase()}! ${current.emoji}`;
@@ -150,8 +178,8 @@
       else $('startBtn').onclick = openClaim;
     } else {
       $('modalTitle').textContent = '¡Casi, casi! 🌼';
-      $('modalText').textContent = `Juntaste ${score} de ${current.goal} flores. Los premios no se escapan: probá de nuevo.`;
-      $('gameState').textContent = 'Pista: las flores crecen sin parar.';
+      $('modalText').textContent = `${lives ? 'Se terminó el tiempo.' : 'Te quedaste sin vidas.'} Atrapaste ${score} de ${current.goal} flores. ¡Probá de nuevo!`;
+      $('gameState').textContent = 'Las flores que se escapan no te quitan vidas.';
       $('startBtn').textContent = `Reintentar nivel ${level+1} ↗`;
       $('startBtn').onclick = startGame;
     }
@@ -163,7 +191,7 @@
     const current = levels[level];
     $('modalKicker').textContent = `NIVEL ${level+1} DE 3 · ${current.name} ${current.emoji}`;
     $('modalTitle').textContent = 'Cada flor cuenta.';
-    $('modalText').textContent = `Juntá ${current.goal} flores en ${current.seconds} segundos. Los yuyos restan dos.`;
+    $('modalText').textContent = `Atrapá ${current.goal} flores amarillas en ${current.seconds} segundos. Tenés tres vidas: no toques los objetos intrusos.`;
     $('gameState').textContent = `Tu premio: ${current.prize.toLowerCase()}.`;
     $('startBtn').textContent = '¡Empezar a juntar! ↗';
     $('startBtn').onclick = startGame;
@@ -181,6 +209,7 @@
   ];
   function openClaim() {
     closeModal();
+    clearTimeout(claimTimeout);
     claimStage = 0;
     $('claimOverlay').hidden = false;
     document.body.style.overflow = 'hidden';
@@ -196,6 +225,7 @@
     $('claimRunBtn').focus();
   }
   function closeClaim() {
+    clearTimeout(claimTimeout);
     $('claimOverlay').hidden = true;
     document.body.style.overflow = '';
     $('playBtn').textContent = 'Jugar otra vez ↗';
@@ -217,22 +247,33 @@
       $('claimRunBtn').hidden = true;
       $('claimProgress').hidden = false;
       const flood = $('flowerFlood');
-      for (let i = 0; i < 170; i++) {
-        const flower = document.createElement('span');
-        flower.className = 'flood-flower';
-        flower.textContent = ['✿','✽','✾','🌼'][i % 4];
-        flower.style.left = `${(i * 61.8) % 100}%`;
-        flower.style.top = `${(i * 37.3) % 100}%`;
-        flower.style.fontSize = `${22 + (i * 13) % 34}px`;
-        flower.style.rotate = `${(i * 31) % 40 - 20}deg`;
-        flood.appendChild(flower);
+      // Start at the bottom row. Every bloom falls from above and stays where it lands.
+      const cell = innerWidth < 600 ? 38 : 47;
+      const columns = Math.ceil(innerWidth / cell) + 1;
+      const rows = Math.ceil(innerHeight / cell) + 1;
+      const fragment = document.createDocumentFragment();
+      for (let row = rows - 1; row >= 0; row--) {
+        for (let col = 0; col < columns; col++) {
+          const flower = document.createElement('span');
+          flower.className = 'flood-flower';
+          flower.textContent = ['✿','✽','✾'][Math.floor(Math.random() * 3)];
+          flower.style.left = `${col * cell - cell * .3 + (Math.random() - .5) * 15}px`;
+          flower.style.top = `${row * cell - cell * .3 + (Math.random() - .5) * 15}px`;
+          flower.style.fontSize = `${cell * (1.35 + Math.random() * .32)}px`;
+          flower.style.setProperty('--drop-delay', `${((rows - 1 - row) / rows * 7.4 + Math.random() * .55).toFixed(2)}s`);
+          flower.style.setProperty('--drop-duration', `${(1.8 + Math.random() * .9).toFixed(2)}s`);
+          flower.style.setProperty('--drift', `${(Math.random() - .5) * 160}px`);
+          flower.style.setProperty('--twist', `${(Math.random() - .5) * 360}deg`);
+          fragment.appendChild(flower);
+        }
       }
+      flood.appendChild(fragment);
       requestAnimationFrame(() => flood.classList.add('rising'));
-      setTimeout(() => {
+      claimTimeout = setTimeout(() => {
         $('claimProgress').hidden = true;
         $('claimFinal').hidden = false;
         $('sendClaimBtn').focus();
-      }, 5600);
+      }, 10500);
     }
   });
   window.springClaimCallback = (result) => {

@@ -8,7 +8,7 @@ Web móvil interactiva de primavera, sin instalación ni compilación. Una puert
 | 2 | 12 flores | 28 s | Un beso |
 | 3 | 16 flores | 32 s | Una salida a comer |
 
-Los yuyos quitan dos flores. El juego se puede reintentar tantas veces como se quiera. Los premios son mensajes divertidos para compartir, no cupones comerciales.
+Las flores y objetos intrusos caen del cielo. Tocá las flores amarillas para armar el ramo; tocar un objeto intruso quita una de las tres vidas. Las flores que se escapan no quitan vidas. El juego se puede reintentar tantas veces como se quiera. Los premios son mensajes divertidos para compartir, no cupones comerciales.
 
 ## Música
 
@@ -22,7 +22,7 @@ Hecho en HTML, CSS y JavaScript. Las tipografías de Google Fonts tienen alterna
 
 ## Reclamo de premios y aviso por correo
 
-Al superar los tres niveles aparece el botón de reclamo. Se escapa cinco veces, luego una ola de flores llena la pantalla y ella puede reclamar los tres premios simbólicos sin completar ningún dato. El aviso identifica el reclamo como «Amor».
+Al superar los tres niveles aparece el botón de reclamo. Se escapa cinco veces, luego caen flores amarillas como confeti y se acumulan desde abajo hasta llenar la pantalla. Ella puede reclamar los tres premios simbólicos sin completar ningún dato. El aviso identifica el reclamo como «Amor».
 
 La web pública **no guarda credenciales**. El archivo `apps-script.gs` es la función de Google Apps Script que envía el aviso al Gmail del dueño mediante `MailApp` (permiso de envío). Tiene destinatario fijo, un envío por minuto y un máximo de 30 por día. Antes de activar el correo:
 
