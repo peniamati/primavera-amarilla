@@ -9,35 +9,37 @@
   <meta property="og:description" content="Las flores nunca se acaban. ¿Podés armar un ramo antes de que se termine el tiempo?">
   <meta property="og:type" content="website">
   <title>Primavera amarilla · Un jardín para jugar</title>
-  <link rel="stylesheet" href="styles.css?v=3">
-  <script src="script.js?v=3" defer></script>
+  <link rel="stylesheet" href="styles.css?v=5">
+  <script src="script.js?v=5" defer></script>
 </head>
 <body class="awaiting-entry">
   <div id="entry" class="entry" role="dialog" aria-modal="true" aria-labelledby="entryTitle">
     <div class="entry-door door-left" aria-hidden="true"></div><div class="entry-door door-right" aria-hidden="true"></div>
-    <div class="entry-inner"><div class="entry-flower" aria-hidden="true">✿</div><span class="entry-kicker">HAY ALGO LINDO DEL OTRO LADO</span><h2 id="entryTitle">La primavera<br>te espera.</h2><p>Abrí la puerta: hay flores, un juego y una canción para vos.</p><button id="enterBtn" class="primary-btn" type="button">Abrir la primavera <span aria-hidden="true">↗</span></button><small>Al entrar comienza «Flores Amarillas» de Floricienta.</small></div>
+    <div class="entry-inner"><div class="entry-flower" aria-hidden="true">✿</div><span class="entry-kicker">HAY ALGO LINDO DEL OTRO LADO</span><h2 id="entryTitle">La primavera<br>te espera.</h2><p>Abrí la puerta: hay flores, un juego y una canción para vos.</p><button id="enterBtn" class="primary-btn" type="button">Abrir la primavera <span aria-hidden="true">↗</span></button><small>Al entrar intentamos reproducir «Flores Amarillas» de Floricienta.</small></div>
   </div>
   <div class="grain" aria-hidden="true"></div>
   <main class="scene">
     <header class="topbar">
       <a class="brand" href="#inicio" aria-label="Primavera amarilla, volver al inicio"><span class="brand-icon">✳</span> primavera amarilla<span class="brand-dot">.</span></a>
-      <button id="soundBtn" class="sound-btn" type="button" aria-label="Apagar música" aria-pressed="true"><span id="soundIcon" aria-hidden="true">♫</span> <span id="soundLabel">Apagar música</span></button>
+      <button id="soundBtn" class="sound-btn" type="button" aria-label="Apagar música" aria-pressed="true"><svg id="soundOnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15 9a5 5 0 0 1 0 6M18 6a9 9 0 0 1 0 12"/></svg><svg id="soundOffIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="m16 9 5 6m0-6-5 6"/></svg></button>
     </header>
 
     <section id="inicio" class="hero" aria-labelledby="title">
       <div class="hero-copy">
         <div class="eyebrow"><span class="sparkle">✦</span> UN PEDACITO DE SOL PARA VOS</div>
         <h1 id="title">Que florezca<br><em>lo bueno.</em><span class="title-flower" aria-hidden="true">✿</span></h1>
-        <p class="intro">Un jardín de flores amarillas que nunca se termina. Quedate un rato, jugá y regalate un poco de primavera.</p>
-        <div class="actions"><button id="playBtn" class="primary-btn" type="button">Armar mi ramo <span aria-hidden="true">↗</span></button><span class="small-note">Gratis, sin registro y con cero alergias.</span></div>
+        <p class="intro">Un jardín que nunca se termina. Juntá flores, pasá de nivel y ganate un premio para compartir.</p>
+        <div class="actions"><button id="playBtn" class="primary-btn" type="button">Empezar a jugar <span aria-hidden="true">↗</span></button><span class="small-note">3 niveles · 3 premios · flores infinitas</span></div>
       </div>
       <div class="hero-stamp" aria-hidden="true"><span>HECHO PARA</span><strong>sonreír</strong><span>✳ &nbsp; ✳ &nbsp; ✳</span></div>
     </section>
 
-    <div id="musicCard" class="music-card"><div class="music-copy"><span>♪ FLORES AMARILLAS</span><strong>Flores Amarillas</strong><small>Floricienta · desde YouTube</small><small>Si no arranca, tocá ▶ en el video.</small></div><div id="playerSlot" class="player-slot"></div></div>
+    <div id="playerSlot" class="player-slot" aria-hidden="true"></div>
 
     <section class="garden-wrap" aria-label="Jardín interactivo de flores amarillas">
-      <div class="garden-top"><span>EL JARDÍN INFINITO <span aria-hidden="true">↘</span></span><span id="gardenHint">Tocá las flores. Sí, en serio.</span></div>
+      <div class="garden-top"><span id="levelTitle">NIVEL 1 · EL ABRAZO 🌼</span><span id="gardenHint">Tocá las flores amarillas</span></div>
+      <div class="level-path" id="levelPath" aria-label="Niveles del juego"><span class="current">1 · Abrazo</span><span>2 · Beso</span><span>3 · Cena</span></div>
+      <div class="play-hud" id="playHud" hidden><span id="hudFlowers">🌼 0 / 8</span><span id="hudTime">⏱ 25 s</span></div>
       <div id="garden" class="garden">
         <div class="sun" aria-hidden="true"><div class="sun-face">ᴗ</div></div>
         <div class="cloud cloud-one" aria-hidden="true"></div><div class="cloud cloud-two" aria-hidden="true"></div>
@@ -48,7 +50,7 @@
       <div class="garden-bottom"><span>🌼 &nbsp; FLORES ILIMITADAS, BUEN HUMOR TAMBIÉN</span><span>EDICIÓN PRIMAVERA</span></div>
     </section>
 
-    <section class="game-info" aria-label="Cómo jugar"><div class="game-number">01 / EL DESAFÍO</div><div><h2>Un ramo contra reloj.</h2><p>Tenés <strong>30 segundos</strong> para juntar <strong>12 flores amarillas</strong>. Las flores crecen sin parar, pero cuidado: los yuyos te sacan dos del ramo. Tocá la flor del jardín, no hace falta instalar nada.</p></div><span class="info-doodle" aria-hidden="true">✺</span></section>
+    <section class="game-info" aria-label="Cómo jugar"><div class="game-number">TRES NIVELES · TRES PREMIOS</div><div><h2>Flores que valen planes.</h2><p>Juntá las flores amarillas antes de que se termine el tiempo y esquivá los yuyos. Cada nivel desbloquea un vale simbólico para compartir con alguien especial.</p><div class="prize-list"><div><span>01</span><strong>Un abrazo</strong><small>El que dura un poquito más.</small></div><div><span>02</span><strong>Un beso</strong><small>Con permiso, por supuesto.</small></div><div><span>03</span><strong>Una salida a comer</strong><small>El menú lo eligen ustedes.</small></div></div></div><span class="info-doodle" aria-hidden="true">✺</span></section>
     <footer>Hecho con ☀ y un poquito de código. <span>Que tengas un lindo día.</span></footer>
   </main>
 
@@ -56,13 +58,13 @@
     <div class="modal-backdrop" data-close="true"></div>
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <button id="closeBtn" class="close-btn" type="button" aria-label="Cerrar juego">×</button>
-      <div class="modal-kicker">MISIÓN PRIMAVERA 🌼</div>
-      <h2 id="modalTitle">Tu ramo empieza acá.</h2>
-      <p id="modalText">Juntá 12 flores en 30 segundos. Esquivá los yuyos. Y, sobre todo, divertite.</p>
-      <div class="score-row"><div><span>FLORES</span><strong id="scoreValue">0 / 12</strong></div><div><span>TIEMPO</span><strong id="timeValue">30s</strong></div></div>
-      <div class="progress-track" role="progressbar" aria-label="Progreso del ramo" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0"><div id="progressBar"></div></div>
+      <div class="modal-kicker" id="modalKicker">NIVEL 1 · EL ABRAZO 🌼</div>
+      <h2 id="modalTitle">Cada flor cuenta.</h2>
+      <p id="modalText">Juntá flores amarillas antes de que se acabe el tiempo. Los yuyos restan dos.</p>
+      <div class="score-row"><div><span>FLORES</span><strong id="scoreValue">0 / 8</strong></div><div><span>TIEMPO</span><strong id="timeValue">25s</strong></div></div>
+      <div class="progress-track" role="progressbar" aria-label="Progreso del ramo" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0"><div id="progressBar"></div></div>
       <button id="startBtn" class="primary-btn modal-action" type="button">¡Empezar a juntar! <span aria-hidden="true">↗</span></button>
-      <p class="game-state" id="gameState" aria-live="polite">Cuando empiece, tocá las flores amarillas del jardín.</p>
+      <p class="game-state" id="gameState" aria-live="polite">Tocá las flores del jardín. ¡El primer premio es un abrazo!</p>
     </div>
   </div>
   <div id="liveStatus" class="sr-only" role="status" aria-live="polite"></div>
